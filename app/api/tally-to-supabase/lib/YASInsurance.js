@@ -78,7 +78,7 @@ const INSURANCE_CONFIG = {
 
   const path = `/partner/${PARTNER_ID}/policy/create`;
   const method = "POST";
-  const timestamp = Date.now().toString();
+  const timestamp = Math.floor(Date.now() / 1000).toString(); // seconds
   const signData = method + path + timestamp + JSON.stringify(body);
 
   const signature = crypto
