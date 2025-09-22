@@ -233,6 +233,8 @@ export async function POST(request) {
       coverageStart: answers["activitydate1"],
     };
 
+    console.log("Prepared insurance data", InsuranceData);
+
     insuranceRes = await createInsurancePolicy(participant, InsuranceData);
 
     console.log("Prepared insurance data");
