@@ -200,9 +200,11 @@ export async function POST(request) {
 
     // --- 6. Insurance Policy ---
 
+    console.log("Creating insurance");
+
     let InsuranceData;
     let insuranceRes;
-    
+
     const nationalityRaw = answers["nationality"]; // e.g. "Malaysian (MY)"
     const nationalityCode = nationalityRaw.match(/\((.*?)\)/)?.[1] || "MY";
 
@@ -233,6 +235,7 @@ export async function POST(request) {
 
     insuranceRes = await createInsurancePolicy(participant, InsuranceData);
 
+    console.log("Prepared insurance data");
     console.log("Insurance response:", insuranceRes);
 
     return Response.json({ success: true });
