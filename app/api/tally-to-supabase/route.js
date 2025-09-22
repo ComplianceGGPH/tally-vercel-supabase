@@ -1,6 +1,6 @@
 // app/api/tally-to-supabase/route.js
 import { createClient } from "@supabase/supabase-js";
-import { createInsurancePolicy } from "@/lib/YASinsurance";
+import { createInsurancePolicy } from "@/lib/YASInsurance";
 import { parsePhoneNumber } from "libphonenumber-js";
 
 const supabase = createClient(
