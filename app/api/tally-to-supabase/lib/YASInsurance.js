@@ -34,6 +34,8 @@ const INSURANCE_CONFIG = {
     },
 };
 
+ console.log("Insurance Data:", insuranceData);
+
   console.log("Branch", insuranceData.branch);
 
   const yasConfig = INSURANCE_CONFIG[insuranceData.branch];
