@@ -1,10 +1,24 @@
 // app/api/tally-to-supabase/route.js
 import { createClient } from "@supabase/supabase-js";
+import { createInsurancePolicy } from "@/lib/insurance";
+import { parsePhoneNumber } from "libphonenumber-js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
+
+function splitPhoneNumber(fullNumber) {
+  try {
+    const phoneNumber = parsePhoneNumber(fullNumber);
+    return {
+      countryCode: phoneNumber.countryCallingCode, // "1684"
+      number: phoneNumber.nationalNumber           // rest of the digits
+    };
+  } catch (err) {
+    return { countryCode: null, number: fullNumber };
+  }
+}
 
 function getReadableValue(field) {
   if (!field) return null;
@@ -56,7 +70,6 @@ function parseAnswers(fieldsArray = []) {
 export async function POST(request) {
   try {
     const payload = await request.json();
-
     if (!payload?.data?.fields) {
       console.error("Invalid payload: no fields found", payload);
       return Response.json({ error: "Invalid payload, no fields" }, { status: 400 });
@@ -84,7 +97,7 @@ export async function POST(request) {
           participant_signature: answers["participantsignature"] || null,
         },
       ])
-      .select("id")
+      .select("id, fullname, dob, nric, nationality, phone_number, email")
       .single();
 
     if (pErr) throw pErr;
@@ -184,6 +197,43 @@ export async function POST(request) {
       const { error: aErr } = await supabase.from("activities").insert(activities);
       if (aErr) throw aErr;
     }
+
+    // --- 6. Insurance Policy ---
+
+    let InsuranceData;
+    let insuranceRes;
+    
+    const nationalityRaw = answers["nationality"]; // e.g. "Malaysian (MY)"
+    const nationalityCode = nationalityRaw.match(/\((.*?)\)/)?.[1] || "MY";
+
+    const isMinor = answers["age"] >= 6 && answers["age"] <= 16;
+
+    // pick which phone/email to use
+    const { countryCode, number } = splitPhoneNumber(
+      isMinor ? answers["guardianphone"] : answers["phonenumber"]
+    );
+
+    InsuranceData = {
+      fullname: answers["fullname"],
+      dateOfBirth: answers["dob"],
+      age: answers["age"],
+      gender: answers["gender"],
+      phone: {
+        countryCode,
+        number,
+      },
+      email: answers["guardianemail"] || answers["email"],
+      address: answers["address"],
+      nric: answers["nric"],
+      nationality: nationalityCode || "MY",
+
+      branch: answers["BRANCH"],         // needed for promo config
+      coverageStart: answers["activitydate1"],
+    };
+
+    insuranceRes = await createInsurancePolicy(participant, InsuranceData);
+
+    console.log("Insurance response:", insuranceRes);
 
     return Response.json({ success: true });
   } catch (err) {
