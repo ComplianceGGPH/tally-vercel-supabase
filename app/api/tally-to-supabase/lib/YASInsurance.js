@@ -34,7 +34,7 @@ const INSURANCE_CONFIG = {
     },
 };
 
- console.log("Insurance Data:", insuranceData);
+  console.log("Insurance Data:", insuranceData);
 
   console.log("Branch", insuranceData.branch);
 
@@ -73,6 +73,9 @@ const INSURANCE_CONFIG = {
   };
 
   // signing request...
+  console.log("Partner ID:", PARTNER_ID);
+  console.log("Secret Key length:", SECRET_KEY?.length);
+
   const path = `/partner/${PARTNER_ID}/policy/create`;
   const method = "POST";
   const timestamp = Date.now().toString();
