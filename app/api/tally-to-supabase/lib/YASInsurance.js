@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { config } from "process";
 
 export async function createInsurancePolicy(insuranceData) {
-  const BASE_URL = "https://application-api-development.yas.com.hk";
+  const BASE_URL = process.env.YAS_BASE_URL;
   const PARTNER_ID = process.env.YAS_PARTNER_ID;
   const SECRET_KEY = process.env.YAS_SECRET_KEY;
 
@@ -34,10 +34,14 @@ const INSURANCE_CONFIG = {
     },
 };
 
+  console.log("Branch", insuranceData.branch);
+
   const yasConfig = INSURANCE_CONFIG[insuranceData.branch];
   if (!yasConfig) {
     throw new Error(`No insurance config found for branch: ${insuranceData.branch}`);
   }
+
+  console.log("Using YAS config:", yasConfig);
 
   const body = {
     mobileCountryCode: insuranceData.phone.countryCode,
