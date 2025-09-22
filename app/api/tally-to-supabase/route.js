@@ -235,7 +235,7 @@ export async function POST(request) {
 
     console.log("Prepared insurance data", InsuranceData);
 
-    insuranceRes = await createInsurancePolicy(participant, InsuranceData);
+    insuranceRes = await createInsurancePolicy(InsuranceData);
 
     console.log("Prepared insurance data");
     console.log("Insurance response:", insuranceRes);
