@@ -85,6 +85,7 @@ const INSURANCE_CONFIG = {
     .update(signData)
     .digest("hex");
 
+  console.log("Timestamp >>>", timestamp);
   console.log("SignData >>>", signData);
   console.log("Signature >>>", signature);
 
