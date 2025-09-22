@@ -73,7 +73,7 @@ const INSURANCE_CONFIG = {
   };
 
   // signing request...
-  console.log(JSON.stringify({body}));
+  console.log(JSON.stringify(body));
 
   const path = `/partner/${PARTNER_ID}/policy/create`;
   const method = "POST";
