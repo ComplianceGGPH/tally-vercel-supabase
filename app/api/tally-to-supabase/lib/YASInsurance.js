@@ -73,6 +73,7 @@ const INSURANCE_CONFIG = {
   };
 
   // signing request...
+  console.log(JSON.stringify({body}));
 
   const path = `/partner/${PARTNER_ID}/policy/create`;
   const method = "POST";
@@ -83,6 +84,9 @@ const INSURANCE_CONFIG = {
     .createHmac("sha256", SECRET_KEY)
     .update(signData)
     .digest("hex");
+
+  console.log("SignData >>>", signData);
+  console.log("Signature >>>", signature);
 
   const res = await fetch(BASE_URL + path, {
     method: "POST",
