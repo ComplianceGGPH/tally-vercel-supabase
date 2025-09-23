@@ -1,6 +1,18 @@
 import crypto from "crypto";
 import { config } from "process";
 
+function generateRequestSignature(secret, path, method, timestamp, body) {
+  const hmac = crypto.createHmac('SHA256', secret);
+
+  let signData = `${method.toUpperCase()}${path}${timestamp}`;
+  if (body !== null && typeof body !== 'undefined') {
+    signData += JSON.stringify(body);
+  }
+
+  hmac.update(signData);
+  return hmac.digest('hex');
+}
+
 export async function createInsurancePolicy(insuranceData) {
   const BASE_URL = process.env.YAS_BASE_URL;
   const PARTNER_ID = process.env.YAS_PARTNER_ID;
@@ -76,28 +88,17 @@ const INSURANCE_CONFIG = {
   console.log(JSON.stringify(body));
 
   const path = `/partner/${PARTNER_ID}/policy/create`;
-  const method = "POST";
-  const timestamp = Math.floor(Date.now() / 1000).toString();
-  const signData = method + path + timestamp + JSON.stringify(body);
+  const method = 'post';
+  const timestamp = Date.now().toString();
 
-  const signature = crypto
-    .createHmac("sha256", SECRET_KEY)
-    .update(signData)
-    .digest("hex");
+  const generatedRequestSignature = generateRequestSignature(SECRET_KEY, path, method, timestamp, JSON.stringify(body));
 
-  console.log("Timestamp >>>", timestamp);
-  console.log("SignData >>>", signData);
-  console.log("Signature >>>", signature);
-
-  const res = await fetch(BASE_URL + path, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json;charset=UTF-8",
-      "X-Timestamp": timestamp,
-      "X-Request-Signature": signature,
-    },
-    body: JSON.stringify(body),
-  });
+  console.log('\n--- Request Details ---');
+  console.log('Method:', method);
+  console.log('Path:', path);
+  console.log('X-Timestamp header value:', timestamp);
+  console.log('Request Body:', JSON.stringify(body));
+  console.log('Generated X-Request-Signature:', generatedRequestSignature);
 
   const data = await res.json();
   if (!res.ok) {
