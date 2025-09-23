@@ -200,42 +200,44 @@ export async function POST(request) {
 
     // --- 6. Insurance Policy ---
 
-    console.log("Creating insurance");
+    if (InsuranceData.age >= 6) {
+      console.log("Creating insurance");
 
-    let InsuranceData;
-    let insuranceRes;
+      let InsuranceData;
+      let insuranceRes;
 
-    const nationalityRaw = answers["nationality"]; // e.g. "Malaysian (MY)"
-    const nationalityCode = nationalityRaw.match(/\((.*?)\)/)?.[1] || "MY";
+      const nationalityRaw = answers["nationality"]; // e.g. "Malaysian (MY)"
+      const nationalityCode = nationalityRaw.match(/\((.*?)\)/)?.[1] || "MY";
 
-    const isMinor = answers["age"] >= 6 && answers["age"] <= 16;
+      const isMinor = answers["age"] <= 16;
 
-    // pick which phone/email to use
-    const { countryCode, number } = splitPhoneNumber(
-      isMinor ? answers["guardianphone"] : answers["phonenumber"]
-    );
+      // pick which phone/email to use
+      const { countryCode, number } = splitPhoneNumber(
+        isMinor ? answers["guardianphone"] : answers["phonenumber"]
+      );
 
-    InsuranceData = {
-      fullname: answers["fullname"],
-      dateOfBirth: answers["dob"],
-      age: answers["age"],
-      gender: answers["gender"],
-      phone: {
-        countryCode,
-        number,
-      },
-      email: answers["guardianemail"] || answers["email"],
-      address: answers["address"],
-      nric: answers["nric"],
-      nationality: nationalityCode || "MY",
+      InsuranceData = {
+        fullname: answers["fullname"],
+        dateOfBirth: answers["dob"],
+        age: answers["age"],
+        gender: answers["gender"],
+        phone: {
+          countryCode,
+          number,
+        },
+        email: answers["guardianemail"] || answers["email"],
+        address: answers["address"],
+        nric: answers["nric"],
+        nationality: nationalityCode || "MY",
 
-      branch: answers["BRANCH"],         // needed for promo config
-      coverageStart: answers["activitydate1"],
-    };
+        branch: answers["BRANCH"],         // needed for promo config
+        coverageStart: answers["activitydate1"],
+      };
 
-    console.log("Prepared insurance data", InsuranceData);
+      console.log("Prepared insurance data", InsuranceData);
 
-    insuranceRes = await createInsurancePolicy(InsuranceData);
+      insuranceRes = await createInsurancePolicy(InsuranceData);
+    }
 
     console.log("Prepared insurance data");
     console.log("Insurance response:", insuranceRes);
