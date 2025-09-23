@@ -99,11 +99,4 @@ const INSURANCE_CONFIG = {
   console.log('X-Timestamp header value:', timestamp);
   console.log('Request Body:', JSON.stringify(body));
   console.log('Generated X-Request-Signature:', generatedRequestSignature);
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data?.error?.message || "Insurance API failed");
-  }
-
-  return data;
 }
