@@ -102,7 +102,7 @@ export async function createInsurancePolicy(insuranceData) {
   console.log("Method:", method);
   console.log("Path:", path);
   console.log("X-Timestamp header value:", timestamp);
-  console.log("Request Body:", bodyString);
+  console.log("Request Body:", body);
   console.log("Generated X-Request-Signature:", signature);
 
   const response = await fetch(`${BASE_URL}${path}`, {
@@ -113,7 +113,7 @@ export async function createInsurancePolicy(insuranceData) {
       "X-Timestamp": timestamp,
       "X-Request-Signature": signature,
     },
-    body: bodyString,
+    body: body.JSON.stringify(body),
   });
 
   if (!response.ok) {
