@@ -113,7 +113,7 @@ export async function createInsurancePolicy(insuranceData) {
       "X-Timestamp": timestamp,
       "X-Request-Signature": signature,
     },
-    body: body.JSON.stringify(body),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
