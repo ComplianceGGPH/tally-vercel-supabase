@@ -213,6 +213,16 @@ export async function POST(request) {
       isMinor ? answers["guardianphone"] : answers["phonenumber"]
     );
 
+    const effectiveStartDates = [
+      answers["activitydate1"] , 
+      answers["activitydate2"] , 
+      answers["activitydate3"] , 
+      answers["activitydate4"] ,
+      answers["activitydate5"] ,
+      answers["activitydate6"] ,
+      answers["activitydate7"]
+    ].filter(Boolean); // remove null/undefined
+
     InsuranceData = {
       fullname: answers["fullname"],
       dateOfBirth: answers["dob"],
@@ -228,9 +238,9 @@ export async function POST(request) {
       nationality: nationalityCode || "MY",
 
       branch: answers["BRANCH"],         // needed for promo config
-      coverageStart: answers["activitydate1"],
+      coverageStart: effectiveStartDates,
     };
-    
+
     if (answers["age"] >= 6) {
 
       console.log("Creating insurance");

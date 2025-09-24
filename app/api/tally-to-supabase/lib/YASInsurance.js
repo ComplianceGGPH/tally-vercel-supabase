@@ -1,3 +1,4 @@
+import { asyncWrapProviders } from "async_hooks";
 import crypto from "crypto";
 
 function generateRequestSignature(secret, path, method, timestamp, bodyString) {
@@ -64,7 +65,7 @@ export async function createInsurancePolicy(insuranceData) {
     mobileCountryCode: insuranceData.phone.countryCode,
     mobileNo: insuranceData.phone.number,
     promoCode: yasConfig.promoCode,
-    effectiveStartDates: [insuranceData.coverageStart],
+    effectiveStartDates: insuranceData.coverageStart,
     productPlanType: "ACTIVITIES_1",
     email: insuranceData.email,
     itemId: "",
