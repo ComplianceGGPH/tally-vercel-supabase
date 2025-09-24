@@ -240,14 +240,24 @@ export async function POST(request) {
       branch: answers["BRANCH"],         // needed for promo config
       coverageStart: effectiveStartDates,
     };
+    // Testing Purpose
+    InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
+    insuranceRes = await createPolicy(InsuranceData);
 
-    if (answers["age"] >= 6) {
+    InsuranceData.branch = "GLAMPING @ WETLAND PUTRAJAYA";
+    insuranceRes = await createPolicy(InsuranceData);
 
-      console.log("Creating insurance");
-      console.log("Prepared insurance data", InsuranceData);
-      insuranceRes = await createPolicy(InsuranceData);
+    InsuranceData.branch = "PUTRAJAYA WETLAND ADVENTURE PARK";
+    insuranceRes = await createPolicy(InsuranceData);
 
-    }
+
+    // if (answers["age"] >= 6) {
+
+    //   console.log("Creating insurance");
+    //   console.log("Prepared insurance data", InsuranceData);
+    //   insuranceRes = await createPolicy(InsuranceData);
+
+    // }
 
     console.log("Prepared insurance data");
     console.log("Insurance response:", insuranceRes);

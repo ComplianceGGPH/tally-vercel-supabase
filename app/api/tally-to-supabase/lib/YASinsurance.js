@@ -63,7 +63,7 @@ export async function main(insuranceData) {
     },
   };
 
-  const yasConfig = INSURANCE_CONFIG["PUTRAJAYA LAKE RECREATION CENTER"];
+  const yasConfig = INSURANCE_CONFIG[insuranceData.branch];
   if (!yasConfig) {
     throw new Error(`No insurance config found for location: ${insuranceData.location}`);
   }
