@@ -136,5 +136,3 @@ export async function main(insuranceData) {
     }
   }
 }
-
-main().catch(console.error);
