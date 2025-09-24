@@ -5,17 +5,17 @@ function generateRequestSignature(secret, path, method, timestamp, body) {
 
   let signData = `${method.toUpperCase()}${path}${timestamp}`;
   if (body !== null && typeof body !== "undefined") {
-    signData += body; // body should already be JSON.stringify'ed
+    signData += JSON.stringify(body);
   }
 
-  const bodyString = JSON.stringify(body);
-  const signString = `${method.toUpperCase()}${path}${timestamp}${bodyString}`;
-
-  console.log("Sign String Used for HMAC:", signString);
-  console.log("Signature Generated:", signature);
+  console.log("Sign String Used for HMAC:", signData);
 
   hmac.update(signData);
-  return hmac.digest("hex"); // ✅ return the actual signature string
+  const signature = hmac.digest("hex");
+
+  console.log("Generated Signature:", signature);
+
+  return signature; 
 }
 
 export async function createInsurancePolicy(insuranceData) {
@@ -88,16 +88,14 @@ export async function createInsurancePolicy(insuranceData) {
   };
 
   const path = `/partner/${PARTNER_ID}/policy/create`;
-  const method = "POST";
+  const method = 'post';
   const timestamp = Date.now().toString();
-
-  const bodyString = JSON.stringify(body);
   const signature = generateRequestSignature(
     SECRET_KEY,
     path,
     method,
     timestamp,
-    bodyString
+    body
   );
 
   console.log("\n--- Request Details ---");
