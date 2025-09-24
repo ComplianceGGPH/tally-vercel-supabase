@@ -1,6 +1,6 @@
 // app/api/tally-to-supabase/route.js
 import { createClient } from "@supabase/supabase-js";
-import { createInsurancePolicy } from "./lib/YASInsurance";
+import { main } from "./lib/YASinsurance";
 import { parsePhoneNumber } from "libphonenumber-js";
 
 const supabase = createClient(
@@ -245,7 +245,7 @@ export async function POST(request) {
 
       console.log("Creating insurance");
       console.log("Prepared insurance data", InsuranceData);
-      insuranceRes = await createInsurancePolicy(InsuranceData);
+      insuranceRes = await main(InsuranceData);
 
     }
 
