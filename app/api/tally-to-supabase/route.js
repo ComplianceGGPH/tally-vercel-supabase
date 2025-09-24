@@ -200,43 +200,43 @@ export async function POST(request) {
 
     // --- 6. Insurance Policy ---
 
+    let InsuranceData;
+    let insuranceRes;
+
+    const nationalityRaw = answers["nationality"]; // e.g. "Malaysian (MY)"
+    const nationalityCode = nationalityRaw.match(/\((.*?)\)/)?.[1] || "MY";
+
+    const isMinor = answers["age"] <= 16;
+
+    // pick which phone/email to use
+    const { countryCode, number } = splitPhoneNumber(
+      isMinor ? answers["guardianphone"] : answers["phonenumber"]
+    );
+
+    InsuranceData = {
+      fullname: answers["fullname"],
+      dateOfBirth: answers["dob"],
+      age: answers["age"],
+      gender: answers["gender"],
+      phone: {
+        countryCode,
+        number,
+      },
+      email: answers["guardianemail"] || answers["email"],
+      address: answers["address"],
+      nric: answers["nric"],
+      nationality: nationalityCode || "MY",
+
+      branch: answers["BRANCH"],         // needed for promo config
+      coverageStart: answers["activitydate1"],
+    };
+    
     if (answers["age"] >= 6) {
+
       console.log("Creating insurance");
-
-      let InsuranceData;
-      let insuranceRes;
-
-      const nationalityRaw = answers["nationality"]; // e.g. "Malaysian (MY)"
-      const nationalityCode = nationalityRaw.match(/\((.*?)\)/)?.[1] || "MY";
-
-      const isMinor = answers["age"] <= 16;
-
-      // pick which phone/email to use
-      const { countryCode, number } = splitPhoneNumber(
-        isMinor ? answers["guardianphone"] : answers["phonenumber"]
-      );
-
-      InsuranceData = {
-        fullname: answers["fullname"],
-        dateOfBirth: answers["dob"],
-        age: answers["age"],
-        gender: answers["gender"],
-        phone: {
-          countryCode,
-          number,
-        },
-        email: answers["guardianemail"] || answers["email"],
-        address: answers["address"],
-        nric: answers["nric"],
-        nationality: nationalityCode || "MY",
-
-        branch: answers["BRANCH"],         // needed for promo config
-        coverageStart: answers["activitydate1"],
-      };
-
       console.log("Prepared insurance data", InsuranceData);
-
       insuranceRes = await createInsurancePolicy(InsuranceData);
+
     }
 
     console.log("Prepared insurance data");
