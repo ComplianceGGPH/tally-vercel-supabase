@@ -8,6 +8,12 @@ function generateRequestSignature(secret, path, method, timestamp, body) {
     signData += body; // body should already be JSON.stringify'ed
   }
 
+  const bodyString = JSON.stringify(body);
+  const signString = `${method.toUpperCase()}${path}${timestamp}${bodyString}`;
+
+  console.log("Sign String Used for HMAC:", signString);
+  console.log("Signature Generated:", signature);
+
   hmac.update(signData);
   return hmac.digest("hex"); // ✅ return the actual signature string
 }
@@ -82,7 +88,7 @@ export async function createInsurancePolicy(insuranceData) {
   };
 
   const path = `/partner/${PARTNER_ID}/policy/create`;
-  const method = "post";
+  const method = "POST";
   const timestamp = Date.now().toString();
 
   const bodyString = JSON.stringify(body);
