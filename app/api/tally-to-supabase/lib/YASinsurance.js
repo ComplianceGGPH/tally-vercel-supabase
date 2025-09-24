@@ -1,5 +1,5 @@
-const crypto = require('crypto');
-const axios = require('axios');
+import crypto from "crypto";
+import axios from "axios";
 
 /**
 * Generates the HMAC-SHA256 signature for an API request.
@@ -23,7 +23,7 @@ function generateRequestSignature(secret, path, method, timestamp, body) {
   return hmac.digest('hex');
 }
 
-async function main(insuranceData) {
+export async function main(insuranceData) {
   console.log('--- YAS API Test Script ---');
 
   const BASE_URL = process.env.YAS_BASE_URL;
@@ -62,6 +62,11 @@ async function main(insuranceData) {
       partner: "PWAP",
     },
   };
+
+  const yasConfig = INSURANCE_CONFIG[insuranceData.branch];
+  if (!yasConfig) {
+    throw new Error(`No insurance config found for location: ${insuranceData.location}`);
+  }
 
   const createPolicyBody = {
     mobileCountryCode: insuranceData.phone.countryCode,
@@ -118,6 +123,7 @@ async function main(insuranceData) {
     console.log('\n--- API Response ---');
     console.log('Status:', response.status);
     console.log('Response Body:', JSON.stringify(response.data, null, 2));
+    return response.data;
   } catch (error) {
     console.log('\n--- API Error ---');
     if (error.response) {
