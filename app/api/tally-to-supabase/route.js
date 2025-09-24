@@ -200,7 +200,7 @@ export async function POST(request) {
 
     // --- 6. Insurance Policy ---
 
-    if (InsuranceData.age >= 6) {
+    if (answers["age"] >= 6) {
       console.log("Creating insurance");
 
       let InsuranceData;
