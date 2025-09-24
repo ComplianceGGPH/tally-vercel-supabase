@@ -99,4 +99,23 @@ const INSURANCE_CONFIG = {
   console.log('X-Timestamp header value:', timestamp);
   console.log('Request Body:', JSON.stringify(body));
   console.log('Generated X-Request-Signature:', generatedRequestSignature);
+
+  const response = await fetch(`${BASE_URL}${path}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "X-Partner-Id": PARTNER_ID,
+      "X-Timestamp": timestamp,
+      "X-Request-Signature": signature,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`YAS API error ${response.status}: ${text}`);
+  }
+
+  const data = await response.json();
+  return data;
 }
