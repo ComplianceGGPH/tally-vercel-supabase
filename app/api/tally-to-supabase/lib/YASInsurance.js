@@ -77,20 +77,19 @@ export async function createInsurancePolicy(insuranceData) {
       documentNo: insuranceData.nric,
       fullName: insuranceData.fullname,
       nationality: insuranceData.nationality,
-      ...(insuranceData.nationality !== "MY"
-        ? { dob: insuranceData.dateOfBirth }
-        : {}),
+      address: insuranceData.address,
+      dob: insuranceData.dateOfBirth,
     },
     declaration: {
       allowPrivacyPromote3P: true,
       allowPrivacyPromote: true,
-    },
+    }
   };
 
   const bodyString = JSON.stringify(body);  // << single canonical version
 
   const path = `/partner/${PARTNER_ID}/policy/create`;
-  const method = "post";
+  const method = 'post';
   const timestamp = Date.now().toString();
   const signature = generateRequestSignature(
     SECRET_KEY,
