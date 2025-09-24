@@ -91,7 +91,7 @@ const INSURANCE_CONFIG = {
   const method = 'post';
   const timestamp = Date.now().toString();
 
-  const generatedRequestSignature = generateRequestSignature(SECRET_KEY, path, method, timestamp, JSON.stringify(body));
+  const signature = generateRequestSignature(SECRET_KEY, path, method, timestamp, JSON.stringify(body));
 
   console.log('\n--- Request Details ---');
   console.log('Method:', method);
