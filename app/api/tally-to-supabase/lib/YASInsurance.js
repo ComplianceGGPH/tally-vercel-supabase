@@ -1,11 +1,11 @@
 import crypto from "crypto";
 
-function generateRequestSignature(secret, path, method, timestamp, body) {
+function generateRequestSignature(secret, path, method, timestamp, bodyString) {
   const hmac = crypto.createHmac("SHA256", secret);
 
   let signData = `${method.toUpperCase()}${path}${timestamp}`;
-  if (body !== null && typeof body !== "undefined") {
-    signData += JSON.stringify(body);
+  if (bodyString) {
+    signData += bodyString;
   }
 
   console.log("Sign String Used for HMAC:", signData);
@@ -15,7 +15,7 @@ function generateRequestSignature(secret, path, method, timestamp, body) {
 
   console.log("Generated Signature:", signature);
 
-  return signature; 
+  return signature;
 }
 
 export async function createInsurancePolicy(insuranceData) {
@@ -87,22 +87,24 @@ export async function createInsurancePolicy(insuranceData) {
     },
   };
 
+  const bodyString = JSON.stringify(body);  // << single canonical version
+
   const path = `/partner/${PARTNER_ID}/policy/create`;
-  const method = 'post';
+  const method = "post";
   const timestamp = Date.now().toString();
   const signature = generateRequestSignature(
     SECRET_KEY,
     path,
     method,
     timestamp,
-    body
+    bodyString
   );
 
   console.log("\n--- Request Details ---");
   console.log("Method:", method);
   console.log("Path:", path);
   console.log("X-Timestamp header value:", timestamp);
-  console.log("Request Body:", body);
+  console.log("Request Body:", bodyString);
   console.log("Generated X-Request-Signature:", signature);
 
   const response = await fetch(`${BASE_URL}${path}`, {
@@ -113,7 +115,7 @@ export async function createInsurancePolicy(insuranceData) {
       "X-Timestamp": timestamp,
       "X-Request-Signature": signature,
     },
-    body: JSON.stringify(body),
+    body: bodyString,
   });
 
   if (!response.ok) {
@@ -121,6 +123,5 @@ export async function createInsurancePolicy(insuranceData) {
     throw new Error(`YAS API error ${response.status}: ${text}`);
   }
 
-  const data = await response.json();
-  return data;
+  return response.json();
 }
