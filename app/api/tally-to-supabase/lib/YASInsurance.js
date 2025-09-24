@@ -1,16 +1,15 @@
 import crypto from "crypto";
-import { config } from "process";
 
 function generateRequestSignature(secret, path, method, timestamp, body) {
-  const hmac = crypto.createHmac('SHA256', secret);
+  const hmac = crypto.createHmac("SHA256", secret);
 
   let signData = `${method.toUpperCase()}${path}${timestamp}`;
-  if (body !== null && typeof body !== 'undefined') {
-    signData += JSON.stringify(body);
+  if (body !== null && typeof body !== "undefined") {
+    signData += body; // body should already be JSON.stringify'ed
   }
 
   hmac.update(signData);
-  return hmac.digest('hex');
+  return hmac.digest("hex"); // ✅ return the actual signature string
 }
 
 export async function createInsurancePolicy(insuranceData) {
@@ -18,37 +17,35 @@ export async function createInsurancePolicy(insuranceData) {
   const PARTNER_ID = process.env.YAS_PARTNER_ID;
   const SECRET_KEY = process.env.YAS_SECRET_KEY;
 
-const INSURANCE_CONFIG = {
+  const INSURANCE_CONFIG = {
     "GOPENG GLAMPING PARK": {
-        promoCode: "GP01",
-        eventName: "GopengGP",
-        partner: "GGP",
+      promoCode: "GP01",
+      eventName: "GopengGP",
+      partner: "GGP",
     },
     "PUTRAJAYA LAKE RECREATION CENTER": {
-        promoCode: "LRC01",
-        eventName: "PutrajayaLRC",
-        partner: "PLRC",
+      promoCode: "LRC01",
+      eventName: "PutrajayaLRC",
+      partner: "PLRC",
     },
-    "BOTANI": {
-        promoCode: "LRC01",
-        eventName: "PutrajayaLRC",
-        partner: "PLRC",
+    BOTANI: {
+      promoCode: "LRC01",
+      eventName: "PutrajayaLRC",
+      partner: "PLRC",
     },
     "GLAMPING @ WETLAND PUTRAJAYA": {
-        promoCode: "GWP01",
-        eventName: "GlowGWP",
-        partner: "GGWP",
+      promoCode: "GWP01",
+      eventName: "GlowGWP",
+      partner: "GGWP",
     },
     "PUTRAJAYA WETLAND ADVENTURE PARK": {
-        promoCode: "WAP01",
-        eventName: "PutrajayaWAP",
-        partner: "PWAP",
+      promoCode: "WAP01",
+      eventName: "PutrajayaWAP",
+      partner: "PWAP",
     },
-};
+  };
 
   console.log("Insurance Data:", insuranceData);
-
-  console.log("Branch", insuranceData.branch);
 
   const yasConfig = INSURANCE_CONFIG[insuranceData.branch];
   if (!yasConfig) {
@@ -84,21 +81,25 @@ const INSURANCE_CONFIG = {
     },
   };
 
-  // signing request...
-  console.log(JSON.stringify(body));
-
   const path = `/partner/${PARTNER_ID}/policy/create`;
-  const method = 'post';
+  const method = "post";
   const timestamp = Date.now().toString();
 
-  const signature = generateRequestSignature(SECRET_KEY, path, method, timestamp, JSON.stringify(body));
+  const bodyString = JSON.stringify(body);
+  const signature = generateRequestSignature(
+    SECRET_KEY,
+    path,
+    method,
+    timestamp,
+    bodyString
+  );
 
-  console.log('\n--- Request Details ---');
-  console.log('Method:', method);
-  console.log('Path:', path);
-  console.log('X-Timestamp header value:', timestamp);
-  console.log('Request Body:', JSON.stringify(body));
-  console.log('Generated X-Request-Signature:', generatedRequestSignature);
+  console.log("\n--- Request Details ---");
+  console.log("Method:", method);
+  console.log("Path:", path);
+  console.log("X-Timestamp header value:", timestamp);
+  console.log("Request Body:", bodyString);
+  console.log("Generated X-Request-Signature:", signature);
 
   const response = await fetch(`${BASE_URL}${path}`, {
     method,
@@ -108,7 +109,7 @@ const INSURANCE_CONFIG = {
       "X-Timestamp": timestamp,
       "X-Request-Signature": signature,
     },
-    body: JSON.stringify(body),
+    body: bodyString,
   });
 
   if (!response.ok) {
