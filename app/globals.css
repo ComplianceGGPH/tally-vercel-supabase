@@ -34,6 +34,7 @@ body {
   flex: 1;         /* make columns expand equally */
   border: 1px solid #ccc;
   padding: 10px;
+  margin-bottom: 10px;
 }
 
 .groupName {
@@ -70,18 +71,33 @@ body {
 }
 
 .actBox {
-  justify-content: center; /* centers horizontally */
-  align-items: center;     /* centers vertically */
-
-  text-align: center;
   display: flex;
+  justify-content: center; /* optional, since flex ratios handle sizing */
+  align-items: center;
+  
   height: 70px;
-  width: 150px;
+  width: 200px;
   border: 1px solid #ccc;
   padding: 10px;
+}
+
+.actBox a {
+  flex: 2;        /* takes 2/3 of the width */
+  text-align: center;
+}
+
+.actBox .pax {
+  flex: 1;        /* takes 1/3 of the width */
+  text-align: center;
 }
 
 .kanbanCol {
   flex: 1;         /* make columns expand equally */
   padding: 10px;
+}
+
+.column {
+  /* enable scrolling */
+  overflow: auto;     /* allows both horizontal + vertical */
+  /* or: overflow-x: auto; overflow-y: auto; */
 }

@@ -75,9 +75,15 @@ export default function clientBoard({ params }) {
   const grouped = activities.reduce((acc, item) => {
     const key = item.submission?.group || "Ungrouped";
     if (!acc[key]) {
-      acc[key] = [];
+      acc[key] = {
+        items: [],
+        ids: []
+      };
     }
-    acc[key].push(item);
+
+    acc[key].items.push(item);
+    acc[key].ids.push(item.submission.participant.id);
+
     return acc;
   }, {});
 
@@ -85,16 +91,20 @@ export default function clientBoard({ params }) {
     <div>
       <h2 className="groupName"> {activity}, {branch} </h2>
       <div className="board">
-        {Object.entries(grouped).map(([activityName, items]) => (
-          <div className="column" key={activityName}>
+        {Object.entries(grouped).map(([groupName, {items, ids}]) => (
+          <div className="column" key={groupName}>
             <br />
-            <h2>{activityName}</h2>
+            <h2>{groupName} - {ids.length} </h2>
             {items.map(item => (
               <div className="box" key={item.submission.participant.id}>
                 {item.submission.participant.fullname} <br />
                 {item.submission.participant.phone_number} <br />
-                {item.submission.participant.health_declaration} <br />
-                {item.submission.participant.age} years old
+                {item.submission.participant.age} years old <br />
+                {item.submission.participant.health_declaration ? (
+                    <span style={{ color: 'red' }}>{item.submission.participant.health_declaration}</span>
+                ) : (
+                  <span style={{ color: 'blue' }}>No Health Condition</span>
+                )}
               </div>
             ))}
           </div>

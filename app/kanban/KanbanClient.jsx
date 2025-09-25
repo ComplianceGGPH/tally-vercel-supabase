@@ -66,6 +66,23 @@ export default function KanbanClient() {
     return acc;
   }, {});
 
+  const CountClientInAct = activities.reduce((acc, item) => {
+    const key = item.activity_name || "No Activity";
+    if (!acc[key]) {
+      acc[key] = {
+        items: [],
+        ids: [],
+        groups: []
+      };
+    }
+
+    acc[key].items.push(item);
+    acc[key].ids.push(item.submission.participant.id);
+    acc[key].groups.push(item.submission.group);
+
+    return acc;
+  }, {});
+
   return (
     <div className="container">
       <h2>Activity Board Page</h2>
@@ -115,11 +132,17 @@ export default function KanbanClient() {
                   {[...new Set(items.map((i) => i.activity_name))].map(
                     (actName) => (
                       <div className="actBox" key={actName}>
-                        <Link
-                          href={`/kanban/${branchDropdown}/${actName}/${actDate}`}
-                        >
+                        <Link href={`/kanban/${branchDropdown}/${actName}/${actDate}`}>
                           {actName}
                         </Link>
+                        {CountClientInAct[actName] && (
+                          <div>
+                            <span style={{ color: 'green' }}>
+                              {CountClientInAct[actName].ids.length} pax <br />
+                              {new Set(CountClientInAct[actName].groups).size} grp
+                            </span>
+                          </div>
+                        )}
                       </div>
                     )
                   )}
