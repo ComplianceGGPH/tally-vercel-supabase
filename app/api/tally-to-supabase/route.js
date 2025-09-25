@@ -214,14 +214,17 @@ export async function POST(request) {
     );
 
     const effectiveStartDates = [
-      answers["activitydate1"] , 
-      answers["activitydate2"] , 
-      answers["activitydate3"] , 
-      answers["activitydate4"] ,
-      answers["activitydate5"] ,
-      answers["activitydate6"] ,
+      answers["activitydate1"], 
+      answers["activitydate2"], 
+      answers["activitydate3"], 
+      answers["activitydate4"],
+      answers["activitydate5"], 
+      answers["activitydate6"], 
       answers["activitydate7"]
-    ].filter(Boolean); // remove null/undefined
+    ]
+    .filter(Boolean) // remove null/undefined/empty
+    .filter((date, idx, arr) => arr.indexOf(date) === idx) // remove duplicates
+    .sort((a, b) => new Date(a) - new Date(b)); // sort earliest → latest
 
     InsuranceData = {
       fullname: answers["fullname"],
@@ -240,24 +243,24 @@ export async function POST(request) {
       branch: answers["BRANCH"],         // needed for promo config
       coverageStart: effectiveStartDates,
     };
-    // Testing Purpose
-    InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
-    insuranceRes = await createPolicy(InsuranceData);
 
-    InsuranceData.branch = "GLAMPING @ WETLAND PUTRAJAYA";
-    insuranceRes = await createPolicy(InsuranceData);
+    // // Testing Purpose
+    // InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
+    // insuranceRes = await createPolicy(InsuranceData);
 
-    InsuranceData.branch = "PUTRAJAYA WETLAND ADVENTURE PARK";
-    insuranceRes = await createPolicy(InsuranceData);
+    // InsuranceData.branch = "GLAMPING @ WETLAND PUTRAJAYA";
+    // insuranceRes = await createPolicy(InsuranceData);
 
+    // InsuranceData.branch = "PUTRAJAYA WETLAND ADVENTURE PARK";
+    // insuranceRes = await createPolicy(InsuranceData);
 
-    // if (answers["age"] >= 6) {
+    if (answers["age"] >= 6) {
 
-    //   console.log("Creating insurance");
-    //   console.log("Prepared insurance data", InsuranceData);
-    //   insuranceRes = await createPolicy(InsuranceData);
+      console.log("Creating insurance");
+      console.log("Prepared insurance data", InsuranceData);
+      insuranceRes = await createPolicy(InsuranceData);
 
-    // }
+    }
 
     console.log("Prepared insurance data");
     console.log("Insurance response:", insuranceRes);

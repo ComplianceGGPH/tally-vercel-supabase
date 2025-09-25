@@ -24,3 +24,64 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.board {
+  display: flex;   /* put children side by side */
+  gap: 16px;       /* spacing between columns */
+}
+
+.box {
+  flex: 1;         /* make columns expand equally */
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.groupName {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.branchDropdown {
+  text-align: center;
+  padding: 8px;
+  margin-bottom: 20px;
+}
+
+.branchDateInput {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+}
+
+.container {
+  gap: 16px;       /* spacing between columns */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.actBoxContainer {
+  text-align: center;
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.actBox {
+  justify-content: center; /* centers horizontally */
+  align-items: center;     /* centers vertically */
+
+  text-align: center;
+  display: flex;
+  height: 70px;
+  width: 150px;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.kanbanCol {
+  flex: 1;         /* make columns expand equally */
+  padding: 10px;
+}
