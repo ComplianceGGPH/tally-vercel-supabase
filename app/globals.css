@@ -29,6 +29,14 @@ body {
 .board {
   display: flex;   /* put children side by side */
   gap: 16px;       /* spacing between columns */
+  border-left: 1px solid #ccc;
+  margin-top: 10px;
+  display: flex;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding-bottom: 1rem; /* optional for scrollbar clearance */
+  max-height: 1000px;
+  padding-left: 10px;
 }
 
 .box {

@@ -119,7 +119,7 @@ export default function KanbanActClient() {
         </div>
       </div>
 
-      <div className="activityBoard">
+      <div className="activities-container">
         {activities.length === 0 ? (
           <p>No activities found for the selected branch and date.</p>
         ) : (
