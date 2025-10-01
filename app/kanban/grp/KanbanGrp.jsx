@@ -56,6 +56,7 @@ export default function KanbanGrpClient() {
                 setGroupDropdown(currentGroup => {
                     if (uniqueGroups.length === 0) {
                         console.log("No groups available, clearing selection");
+                        setActivities([]);
                         return "";
                     }
                     
@@ -85,6 +86,7 @@ export default function KanbanGrpClient() {
             
             if (!branchDropdown || !actDate || !groupDropdown) {
                 console.log("⏭️ Skipping fetch - missing filters");
+                setActivities([]);
                 return;
             }
             
@@ -104,7 +106,8 @@ export default function KanbanGrpClient() {
                             id,
                             fullname,
                             health_declaration,
-                            phone_number
+                            phone_number,
+                            age
                         )
                     )
                 `)
@@ -128,17 +131,6 @@ export default function KanbanGrpClient() {
         fetchData();
     }, [branchDropdown, actDate, groupDropdown]);
 
-    
-    const grouped = activities.reduce((acc, item) => {
-        const key = item.activity_date || "No Date";
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(item);
-        return acc;
-    }, {});
-
-    const count = activities.filter(item => item.submission.group === groupDropdown)
-                            .length;
-
     // update URL when filters change
     useEffect(() => {
         const params = new URLSearchParams();
@@ -149,6 +141,16 @@ export default function KanbanGrpClient() {
         // CURRENT ROUTE PLEASE
         router.push(`/kanban/grp?${params.toString()}`, { scroll: false });
     }, [branchDropdown, actDate, groupDropdown, router]);
+    
+    const grouped = activities.reduce((acc, item) => {
+        const key = item.activity_date || "No Date";
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(item);
+        return acc;
+    }, {});
+
+    const count = activities.filter(item => item.submission.group === groupDropdown)
+                            .length;
 
     return (
         <div className="container">
@@ -209,7 +211,7 @@ export default function KanbanGrpClient() {
             {/* Display activities */}
             <div className="activities-container">
                 {activities.length === 0 ? (
-                    branchDropdown && actDate && groupDropdown && (
+                    branchDropdown && actDate && (
                         <p>No activities found for the selected filters.</p>
                     )
                 ) : (
@@ -234,15 +236,14 @@ export default function KanbanGrpClient() {
                             </div>
                         ))
                 )}
-            </div><br />
+            </div>
 
             {/* Display Unique Pax Count */}
-            <div className="Pax Count">
+            <div className="PaxCount">
                 <span style={{ color: 'green' }}>
                     {
                         new Set(
                             activities
-                            .filter(item => item.submission.group === groupDropdown)
                             .map(item => item.submission.participant.id)
                         ).size
                     } pax <br />
@@ -251,7 +252,7 @@ export default function KanbanGrpClient() {
                         new Set(
                             activities
                             .filter(item => item.submission.participant.health_declaration)
-                            .map(item => item.submission.group)
+                            .map(item => item.submission.participant.id)
                         ).size
                     } pax
                 </span>
@@ -288,7 +289,7 @@ export default function KanbanGrpClient() {
                         </div>
                     ))
                 ) : (
-                    branchDropdown && actDate && groupDropdown && (
+                    branchDropdown && actDate && (
                         <p>No participants found for the selected filters.</p>
                     )
                 )}

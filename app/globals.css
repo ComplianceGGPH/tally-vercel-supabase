@@ -20,6 +20,7 @@
 }
 
 body {
+  flex: 1;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
@@ -43,17 +44,21 @@ body {
   font-size: 24px;
   font-weight: bold;
 }
-
+/* 
 .branchDropdown {
   text-align: center;
   padding: 8px;
-  margin-bottom: 20px;
-}
+} */
 
 .branchDateInput {
+  margin-top: 10px;
   display: flex;
+  flex-direction: column;
   gap: 8px;
   padding: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+  border-left: 1px solid #ccc;
 }
 
 .container {
@@ -61,6 +66,29 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+}
+
+.activities-container {
+  border-left: 1px solid #ccc;
+  margin-top: 10px;
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  flex-direction: column; /* stack children vertically */
+  gap: 1rem; /* optional spacing between columns */
+  padding-bottom: 1rem; /* optional for scrollbar clearance */
+}
+
+.participants-container {
+  margin-top: 10px;
+  display: flex;
+  overflow-y: auto;
+  max-height: 400px;
+  white-space: nowrap;
+  flex-direction: column; /* stack children vertically */
+  gap: 1rem; /* optional spacing between columns */
+  padding: 1rem; /* optional for scrollbar clearance */
+  border-left: 1px solid #ccc;
 }
 
 .actBoxContainer {
@@ -100,4 +128,8 @@ body {
   /* enable scrolling */
   overflow: auto;     /* allows both horizontal + vertical */
   /* or: overflow-x: auto; overflow-y: auto; */
+}
+
+.PaxCount {
+  margin-top: 10px;
 }
