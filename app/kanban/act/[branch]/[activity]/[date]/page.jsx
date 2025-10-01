@@ -94,7 +94,7 @@ export default function clientBoard({ params }) {
         {Object.entries(grouped).map(([groupName, {items, ids}]) => (
           <div className="column" key={groupName}>
             <br />
-            <h2>{groupName} - {ids.length} </h2>
+            <h2>{groupName} - {ids.length} pax </h2>
             {items.map(item => (
               <div className="box" key={item.submission.participant.id}>
                 {item.submission.participant.fullname} <br />

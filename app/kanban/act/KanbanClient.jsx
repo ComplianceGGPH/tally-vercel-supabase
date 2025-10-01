@@ -9,7 +9,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-export default function KanbanClient() {
+export default function KanbanActClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -56,7 +56,8 @@ export default function KanbanClient() {
     if (branchDropdown) params.set("branch", branchDropdown);
     if (actDate) params.set("date", actDate);
 
-    router.push(`/kanban?${params.toString()}`, { scroll: false });
+    // CURRENT ROUTE PLEASE
+    router.push(`/kanban/act?${params.toString()}`, { scroll: false });
   }, [branchDropdown, actDate, router]);
 
   const grouped = activities.reduce((acc, item) => {
@@ -86,6 +87,9 @@ export default function KanbanClient() {
   return (
     <div className="container">
       <h2>Activity Board Page</h2>
+      <Link href="/kanban">
+          Back to Kanban / Board Selection
+      </Link>
       <div className="branchDateInput">
         <div>
           <label htmlFor="branchDropdown">Choose Branch : </label>
@@ -132,7 +136,7 @@ export default function KanbanClient() {
                   {[...new Set(items.map((i) => i.activity_name))].map(
                     (actName) => (
                       <div className="actBox" key={actName}>
-                        <Link href={`/kanban/${branchDropdown}/${actName}/${actDate}`}>
+                        <Link href={`/kanban/act/${branchDropdown}/${actName}/${actDate}`}>
                           {actName}
                         </Link>
                         {CountClientInAct[actName] && (

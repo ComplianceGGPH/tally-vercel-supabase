@@ -1,13 +1,21 @@
-// app/kanban/page.jsx
-"use client";
+import Link from "next/link";
 
-import { Suspense } from "react";
-import KanbanClient from "./KanbanClient";
-
-export default function KanbanPage() {
+export default function Kanban() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <KanbanClient />
-    </Suspense>
+    <div>
+      <h1>Welcome</h1>
+      <p>Choose sort by group or activity</p>
+      <p>*click on any of below</p> <br />
+      <Link
+        href={`/kanban/grp`}
+      >
+        Go to Group Selection
+      </Link> <br />
+      <Link
+        href={`/kanban/act`}
+      >
+        Go to Activity Selection
+      </Link>
+    </div>
   );
 }
