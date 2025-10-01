@@ -85,6 +85,7 @@ body {
   flex-direction: column; /* stack children vertically */
   gap: 1rem; /* optional spacing between columns */
   padding-bottom: 1rem; /* optional for scrollbar clearance */
+  padding-left: 10px;
 }
 
 .participants-container {
@@ -112,7 +113,7 @@ body {
   align-items: center;
   
   height: 70px;
-  width: 200px;
+  width: 350px;
   border: 1px solid #ccc;
   padding: 10px;
 }
@@ -140,4 +141,9 @@ body {
 
 .PaxCount {
   margin-top: 10px;
+}
+
+.paxgrpCount {
+  padding-left: 10px;
+  padding-right: 10px;
 }

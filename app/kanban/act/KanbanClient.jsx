@@ -19,6 +19,15 @@ export default function KanbanActClient() {
   );
   const [actDate, setActDate] = useState(searchParams.get("date") || "");
   const [activities, setActivities] = useState([]);
+  const [dayName, setDayName] = useState('');
+
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+    setActDate(selectedDate);
+
+    const day = new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' });
+    setDayName(day);
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -108,14 +117,15 @@ export default function KanbanActClient() {
           </select>
         </div>
         <div>
-          <label htmlFor="actDate">Date : </label>
-          <input
-            type="date"
-            id="actDate"
-            name="actDate"
-            value={actDate}
-            onChange={(e) => setActDate(e.target.value)}
-          />
+            <label htmlFor="actDate">Date : </label>
+            <input
+                type="date"
+                id="actDate"
+                name="actDate"
+                value={actDate}
+                onChange={handleDateChange}
+            />
+            {dayName && <span style={{ marginLeft: '10px' }}>( {dayName} )</span>}
         </div>
       </div>
 
@@ -140,7 +150,7 @@ export default function KanbanActClient() {
                           {actName}
                         </Link>
                         {CountClientInAct[actName] && (
-                          <div>
+                          <div className="paxgrpCount">
                             <span style={{ color: 'green' }}>
                               {CountClientInAct[actName].ids.length} pax <br />
                               {new Set(CountClientInAct[actName].groups).size} grp

@@ -21,6 +21,7 @@ export default function KanbanGrpClient() {
     const [actDate, setActDate] = 
         useState(searchParams.get("date") || "");
     const [activities, setActivities] = useState([]);
+    const [dayName, setDayName] = useState('');
 
     // Fetch groups when branch or date changes
     useEffect(() => {
@@ -141,6 +142,14 @@ export default function KanbanGrpClient() {
         // CURRENT ROUTE PLEASE
         router.push(`/kanban/grp?${params.toString()}`, { scroll: false });
     }, [branchDropdown, actDate, groupDropdown, router]);
+
+    const handleDateChange = (e) => {
+        const selectedDate = e.target.value;
+        setActDate(selectedDate);
+
+        const day = new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' });
+        setDayName(day);
+    };
     
     const grouped = activities.reduce((acc, item) => {
         const key = item.activity_date || "No Date";
@@ -176,6 +185,7 @@ export default function KanbanGrpClient() {
                         <option value="GCT EVENTS">GCT EVENTS</option>
                     </select>
                 </div>
+
                 <div>
                     <label htmlFor="actDate">Date : </label>
                     <input
@@ -183,9 +193,11 @@ export default function KanbanGrpClient() {
                         id="actDate"
                         name="actDate"
                         value={actDate}
-                        onChange={(e) => setActDate(e.target.value)}
+                        onChange={handleDateChange}
                     />
+                    {dayName && <span style={{ marginLeft: '10px' }}>( {dayName} )</span>}
                 </div>
+
                 <div>
                     <label htmlFor="groupDropdown">Choose Group : </label>
                     <select
@@ -221,20 +233,66 @@ export default function KanbanGrpClient() {
                             if (timeB === "No Time") return -1;
                             return timeA.localeCompare(timeB);
                         })
-                        .map(([activityTime, items]) => (
-                            <div className="kanbanCol" key={activityTime}>
-                                <h2>Date : {activityTime}</h2>
-                                <div className="actBoxContainer">
-                                    {[...new Set(items.map((i) => i.activity_name))].map(
-                                        (actName) => (
-                                            <div className="actBox" key={actName}>
-                                                {actName}
-                                            </div>
-                                        )
-                                    )}
+                        .map(([activityDate, items]) => {
+                            // Get day name for the activityDate
+                            let dayLabel = "";
+                            if (activityDate && activityDate !== "No Date") {
+                                const dateObj = new Date(activityDate);
+                                if (!isNaN(dateObj)) {
+                                    dayLabel = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+                                }
+                            }
+                            return (
+                                <div className="kanbanCol" key={activityDate}>
+                                    <h2>
+                                        Date : {activityDate}
+                                        {dayLabel && (
+                                            <span style={{ marginLeft: '10px' }}>
+                                                ( {dayLabel} )
+                                            </span>
+                                        )}
+                                    </h2>
+                                    <div className="actBoxContainer">
+                                        {items
+                                            .slice()
+                                            .sort((a, b) => {
+                                                // Handle missing or invalid times
+                                                if (!a.activity_time) return 1;
+                                                if (!b.activity_time) return -1;
+                                                return a.activity_time.localeCompare(b.activity_time);
+                                            })
+                                            // Only show unique activity_name per time slot
+                                            .filter(
+                                                (item, idx, arr) =>
+                                                    arr.findIndex(
+                                                        i =>
+                                                            i.activity_name === item.activity_name &&
+                                                            i.activity_time === item.activity_time
+                                                    ) === idx
+                                            )
+                                            .map((item) => {
+                                                // Convert 24h time to 12h format
+                                                let time12h = "";
+                                                if (item.activity_time) {
+                                                    const [hour, minute] = item.activity_time.split(":");
+                                                    const h = parseInt(hour, 10);
+                                                    const ampm = h >= 12 ? "PM" : "AM";
+                                                    const hour12 = ((h + 11) % 12 + 1);
+                                                    time12h = `${hour12}:${minute} ${ampm}`;
+                                                }
+                                                return (
+                                                    <div className="actBox" key={item.activity_name + item.activity_time}>
+                                                        <span style={{ fontWeight: "bold" }}>
+                                                            {item.activity_time ? time12h + '-' : ""}
+                                                        </span>
+                                                        {item.activity_name}
+                                                    </div>
+                                                );
+                                            })}
+                                    </div>
                                 </div>
-                            </div>
-                        ))
+                            );
+                        })
                 )}
             </div>
 
