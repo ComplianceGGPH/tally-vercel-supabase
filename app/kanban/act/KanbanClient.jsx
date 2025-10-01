@@ -93,6 +93,18 @@ export default function KanbanActClient() {
     return acc;
   }, {});
 
+  // Helper to convert 24h time to 12h format
+  function formatTo12Hour(timeStr) {
+    if (!timeStr || timeStr === "No Time") return timeStr;
+    // Handles "HH:mm" or "HH:mm:ss"
+    const [h, m] = timeStr.split(":");
+    let hour = parseInt(h, 10);
+    const minute = m || "00";
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return `${hour}:${minute.padStart(2, "0")} ${ampm}`;
+  }
+
   return (
     <div className="container">
       <h2>Activity Board Page</h2>
@@ -141,7 +153,7 @@ export default function KanbanActClient() {
             })
             .map(([activityTime, items]) => (
               <div className="kanbanCol" key={activityTime}>
-                <h2>Session : {activityTime}</h2>
+                <h2>Session : {formatTo12Hour(activityTime)}</h2>
                 <div className="actBoxContainer">
                   {[...new Set(items.map((i) => i.activity_name))].map(
                     (actName) => (

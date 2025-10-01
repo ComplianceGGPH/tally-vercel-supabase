@@ -232,8 +232,7 @@ export default function KanbanGrpClient() {
                             if (timeA === "No Time") return 1;
                             if (timeB === "No Time") return -1;
                             return timeA.localeCompare(timeB);
-                        })
-                        .map(([activityDate, items]) => {
+                        }).map(([activityDate, items]) => {
                             // Get day name for the activityDate
                             let dayLabel = "";
                             if (activityDate && activityDate !== "No Date") {
