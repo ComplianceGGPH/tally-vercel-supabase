@@ -164,8 +164,11 @@ export default function KanbanGrpClient() {
     return (
         <div className="container">
             <h1>Kanban Group View</h1>
-            <Link href="/kanban">
+            
+            <Link href="/kanban" passHref>
+                <div className="box text-center" style={{ cursor: 'pointer' }}>
                 Back to Kanban / Board Selection
+                </div>
             </Link>
 
             <div className="branchDateInput">

@@ -108,8 +108,10 @@ export default function KanbanActClient() {
   return (
     <div className="container">
       <h2>Activity Board Page</h2>
-      <Link href="/kanban">
+      <Link href="/kanban" passHref>
+        <div className="box text-center" style={{ cursor: 'pointer' }}>
           Back to Kanban / Board Selection
+        </div>
       </Link>
       <div className="branchDateInput">
         <div>
