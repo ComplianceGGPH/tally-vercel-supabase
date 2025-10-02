@@ -18,7 +18,7 @@ export default function Kanban() {
             Go to Activity Selection
           </div>
         </Link>
-        
+
         <br />
 
         <Link href={`/`} passHref >

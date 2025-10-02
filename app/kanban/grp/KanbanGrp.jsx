@@ -164,7 +164,7 @@ export default function KanbanGrpClient() {
     return (
         <div className="container">
             <h1>Kanban Group View</h1>
-            
+
             <Link href="/kanban" passHref>
                 <div className="box text-center" style={{ cursor: 'pointer' }}>
                 Back to Kanban / Board Selection
@@ -283,7 +283,7 @@ export default function KanbanGrpClient() {
                                                     time12h = `${hour12}:${minute} ${ampm}`;
                                                 }
                                                 return (
-                                                    <div className="actBox" key={item.activity_name + item.activity_time}>
+                                                    <div className="box actBox" key={item.activity_name + item.activity_time}>
                                                         <span style={{ fontWeight: "bold" }}>
                                                             {item.activity_time ? time12h + '-' : ""}
                                                         </span>

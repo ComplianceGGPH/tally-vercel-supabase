@@ -39,11 +39,14 @@ body {
   padding-left: 10px;
 }
 
-.box {
+.box{
   flex: 1;         /* make columns expand equally */
-  border: 1px solid #ccc;
+  border: 1px solid #000000;
   padding: 10px;
   margin-bottom: 10px;
+  background-color: rgb(17, 24, 24);
+  color: whitesmoke;
+  border-radius: 8px;
 }
 
 .groupName {
@@ -114,7 +117,7 @@ body {
   
   height: 70px;
   width: 350px;
-  border: 1px solid #ccc;
+  border: 1px solid #000000;
   padding: 10px;
 }
 
