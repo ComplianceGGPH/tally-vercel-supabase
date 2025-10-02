@@ -159,7 +159,7 @@ export default function KanbanActClient() {
                 <div className="actBoxContainer">
                   {[...new Set(items.map((i) => i.activity_name))].map(
                     (actName) => (
-                      <div className="actBox" key={actName}>
+                      <div className="box actBox" key={actName}>
                         <Link href={`/kanban/act/${branchDropdown}/${actName}/${actDate}`}>
                           {actName}
                         </Link>

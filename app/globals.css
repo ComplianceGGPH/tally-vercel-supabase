@@ -80,7 +80,7 @@ body {
 }
 
 .activities-container {
-  border-left: 1px solid #ccc;
+  /* border-left: 1px solid #ccc; */
   margin-top: 10px;
   display: flex;
   overflow-x: auto;
@@ -100,12 +100,15 @@ body {
   flex-direction: column; /* stack children vertically */
   gap: 1rem; /* optional spacing between columns */
   padding: 1rem; /* optional for scrollbar clearance */
-  border-left: 1px solid #ccc;
+  /* border-left: 1px solid #ccc; */
 }
 
 .actBoxContainer {
   text-align: center;
   display: flex;
+  flex-direction: row;     /* 👈 ensures horizontal layout */
+  overflow-x: auto;        /* 👈 enables horizontal scrolling */
+  overflow-y: hidden;      /* 👈 prevents vertical scroll */
   gap: 10px;
   margin-top: 10px;
 }
