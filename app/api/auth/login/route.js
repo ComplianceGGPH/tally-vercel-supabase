@@ -9,11 +9,11 @@ export async function POST(request) {
     
     // Set httpOnly cookie (can't be accessed by JS)
     response.cookies.set('session', 'authenticated', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60, // * 24, // 24 hours
-      path: '/',
+        httpOnly: true,
+        secure: true, // Always true in production
+        sameSite: 'lax', // Changed from 'strict'
+        maxAge: 60 * 60,
+        path: '/',
     });
     
     return response;
