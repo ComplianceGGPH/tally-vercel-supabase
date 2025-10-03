@@ -29,7 +29,6 @@ body {
 .board {
   display: flex;   /* put children side by side */
   gap: 16px;       /* spacing between columns */
-  border-left: 1px solid #ccc;
   margin-top: 10px;
   display: flex;
   overflow-y: auto;
@@ -152,4 +151,13 @@ body {
 .paxgrpCount {
   padding-left: 10px;
   padding-right: 10px;
+}
+
+.login-form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Full viewport height */
+  gap: 10px;
 }

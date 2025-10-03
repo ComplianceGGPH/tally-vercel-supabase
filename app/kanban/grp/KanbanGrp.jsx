@@ -33,7 +33,8 @@ export default function KanbanGrpClient() {
                 .select(`
                     submission:submission_id(
                         group
-                    )
+                    ),
+                    participant:participant_id(id)
                 `)
                 .eq("submission.branch", branchDropdown)
                 .eq("activity_date", actDate);
@@ -335,17 +336,21 @@ export default function KanbanGrpClient() {
                         return 0;
                     })
                     .map((participant) => (
-                        <div className="box" key={participant.id}>
-                            {participant.fullname} <br />
-                            {participant.phone_number} <br />
-                            {participant.age} years old <br />
-                            {participant.health_declaration ? (
-                                <span style={{ color: 'red' }}>
-                                    {participant.health_declaration}
-                                </span>
-                            ) : (
-                                <span style={{ color: 'blue' }}>No Health Condition</span>
-                            )}
+                        <div key={participant.id}>
+                            <Link href={`/kanban/grp/${participant.id}`}>
+                                <div className="box">
+                                    {participant.fullname} <br />
+                                    {participant.phone_number} <br />
+                                    {participant.age} years old <br />
+                                    {participant.health_declaration ? (
+                                        <span style={{ color: 'red' }}>
+                                            {participant.health_declaration}
+                                        </span>
+                                    ) : (
+                                        <span style={{ color: 'blue' }}>No Health Condition</span>
+                                    )}
+                                </div>
+                            </Link>
                         </div>
                     ))
                 ) : (

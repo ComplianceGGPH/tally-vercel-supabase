@@ -244,6 +244,8 @@ export async function POST(request) {
       coverageStart: effectiveStartDates,
     };
 
+    
+
     // // Testing Purpose
     // InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
     // insuranceRes = await createPolicy(InsuranceData);
@@ -258,7 +260,13 @@ export async function POST(request) {
 
       console.log("Creating insurance");
       console.log("Prepared insurance data", InsuranceData);
-      insuranceRes = await createPolicy(InsuranceData);
+      if (InsuranceData.branch === "GOPENG GLAMPING PARK") {
+        insuranceRes = await createPolicy(InsuranceData);
+      } else {
+        InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
+        insuranceRes = await createPolicy(InsuranceData);
+      }
+
 
     }
 
