@@ -13,6 +13,11 @@ export default function ClientBoard({ params }) {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // print as PDF
+  const printPDF = () => {
+    window.print();
+  };
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -51,65 +56,132 @@ export default function ClientBoard({ params }) {
 
   return (
     <div>
-      <h1>Client Board for {clientid}</h1>
+      <div className="box text-center text-2xl font-bold">
+        <h1>Client Board for {clientid}</h1>
+      </div>
       {activities.length === 0 ? (
         <p>No activities found.</p>
       ) : (
         activities.map((submission) => (
-          <div key={submission.id} className="box">
-            <h2>Group: {submission.group || "N/A"}</h2>
-            <p>Branch: {submission.branch || "N/A"}</p>
-            <p>Booking Status: {submission.booking_status || "N/A"}</p>
-            <p>Activity Amount: {submission.activity_amount || "N/A"}</p>
-
-            <br /><h3>Participant Details</h3>
-            {submission.participant ? (
-              <div>
-                <p>Name: {submission.participant.fullname || "N/A"}</p>
-                <p>Email: {submission.participant.email || "N/A"}</p>
-                <p>Phone: {submission.participant.phone_number || "N/A"}</p>
-                <p>NRIC: {submission.participant.nric || "N/A"}</p>
-                <p>Date of Birth: {submission.participant.dob || "N/A"}</p>
-                <p>Address: {submission.participant.address || "N/A"}</p>
+          <div key={submission.id}>
+            <div className="box">
+              <div className="info-row">
+                <span className="info-label">Group:</span>
+                <span className="info-value">{submission.group || "N/A"}</span>
               </div>
-            ) : (
-              <p>No participant details available.</p>
-            )}
-
-            <br /><h3>Guardian Details</h3>
-            {submission.guardian ? (
-              <div>
-                <p>Name: {submission.guardian.guardian_fullname || "N/A"}</p>
-                <p>Phone: {submission.guardian.guardian_phone || "N/A"}</p>
-                <p>Relationship: {submission.guardian.guardian_relationship || "N/A"}</p>
+              <div className="info-row">
+                <span className="info-label">Branch:</span>
+                <span className="info-value">{submission.branch || "N/A"}</span>
               </div>
-            ) : (
-              <p>No guardian details available.</p>
-            )}
-
-            <br /><h3>Emergency Contact</h3>
-            {submission.emergency_contact ? (
-              <div>
-                <p>Name: {submission.emergency_contact.emergency_fullname || "N/A"}</p>
-                <p>Phone: {submission.emergency_contact.emergency_phone || "N/A"}</p>
-                <p>Relationship: {submission.emergency_contact.emergency_relationship || "N/A"}</p>
+              <div className="info-row">
+                <span className="info-label">Booking Status:</span>
+                <span className="info-value">{submission.booking_status || "N/A"}</span>
               </div>
-            ) : (
-              <p>No emergency contact details available.</p>
-            )}
+              <div className="info-row">
+                <span className="info-label">Activity Amount:</span>
+                <span className="info-value">{submission.activity_amount || "N/A"}</span>
+              </div>
+            </div>
+            <div className="submission-container">
+            <div className="box">
+              <h3 className="text-2xl font-bold">Participant Details</h3>
+              {submission.participant ? (
+                <div>
+                  <div className="info-row">
+                    <span className="info-label">Name:</span>
+                    <span className="info-value">{submission.participant.fullname || "N/A"}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Email:</span>
+                    <span className="info-value">{submission.participant.email || "N/A"}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Phone:</span>
+                    <span className="info-value">{submission.participant.phone_number || "N/A"}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">NRIC:</span>
+                    <span className="info-value">{submission.participant.nric || "N/A"}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Date of Birth:</span>
+                    <span className="info-value">{submission.participant.dob || "N/A"}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Address:</span>
+                    <span className="info-value">{submission.participant.address || "N/A"}</span>
+                  </div>
+                </div>
+              ) : (
+                <p>No participant details available.</p>
+              )}
+            </div>
 
-            <br /><h3>Activities</h3>
-            {submission.activities && submission.activities.length > 0 ? (
-              <ul>
-                {submission.activities.map((activity) => (
-                  <li key={activity.id}>
-                    {activity.activity_name || "N/A"} - {activity.activity_date || "N/A"} - {activity.activity_time || "N/A"}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No activities available.</p>
-            )}
+            <div className="box">
+              <h3 className="text-2xl font-bold">Guardian Details</h3>
+              {submission.guardian ? (
+                <div>
+                  <div className="info-row">
+                    <span className="info-label">Name:</span>
+                    <span className="info-value">{submission.guardian.guardian_name || "N/A"}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Phone:</span>
+                    <span className="info-value">{submission.guardian.guardian_phone || "N/A"}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Email:</span>
+                    <span className="info-value">{submission.guardian.guardian_email || "N/A"}</span>
+                  </div>
+                </div>
+              ) : (
+                <p>No guardian details available.</p>
+              )}
+            </div>
+
+            <div className="box">
+              <h3 className="text-2xl font-bold">Emergency Contact</h3>
+              {submission.emergency_contact ? (
+                <div>
+                  <div className="info-row">
+                    <span className="info-label">Name:</span>
+                    <span className="info-value">{submission.emergency_contact.emergency_fullname || "N/A"}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Phone:</span>
+                    <span className="info-value">{submission.emergency_contact.emergency_phone || "N/A"}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Relationship:</span>
+                    <span className="info-value">{submission.emergency_contact.emergency_relationship || "N/A"}</span>
+                  </div>
+                </div>
+              ) : (
+                <p>No emergency contact details available.</p>
+              )}
+            </div>
+
+            <div className="box">
+              <h3 className="text-2xl font-bold">Activities</h3>
+              {submission.activities && submission.activities.length > 0 ? (
+                <div>
+                  {submission.activities.map((activity) => (
+                    <div key={activity.id} className="info-row">
+                      <span className="info-label">Activity:</span>
+                      <span className="info-value">
+                        {activity.activity_name || "N/A"} - {activity.activity_date || "N/A"} - {activity.activity_time || "N/A"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p>No activities available.</p>
+              )}
+            </div>
+          </div>
+          <button onClick={printPDF} className="box print:hidden">
+            Print/Download PDF
+          </button>
           </div>
         ))
       )}

@@ -161,3 +161,29 @@ body {
   height: 100vh; /* Full viewport height */
   gap: 10px;
 }
+
+.info-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #333;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 600;
+}
+
+.info-value {
+  color: #ededed;
+}
+
+@media print {
+  .print\:hidden {
+    display: none;
+  }
+}
