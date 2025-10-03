@@ -153,6 +153,21 @@ body {
   padding-right: 10px;
 }
 
+.submission-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.submission-container .box{
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* vertical centering */
+  justify-content: center; /* optional: horizontal centering */
+  height: 100%; /* or set a fixed height like 200px */
+}
+
 .login-form{
   display: flex;
   flex-direction: column;
@@ -164,7 +179,7 @@ body {
 
 .info-row {
   display: grid;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: 100px 1fr;
   gap: 1rem;
   padding: 0.5rem 0;
   border-bottom: 1px solid #333;
@@ -176,6 +191,7 @@ body {
 
 .info-label {
   font-weight: 600;
+  text-align: left;
 }
 
 .info-value {
@@ -186,4 +202,15 @@ body {
   .print\:hidden {
     display: none;
   }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .box {
+    background-color: black !important;
+    color: white !important;
+  }
+
 }

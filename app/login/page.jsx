@@ -25,7 +25,7 @@ function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleLogin}>
+    <form onSubmit={handleLogin} className="login-form">
       <input
         type="password"
         value={password}
