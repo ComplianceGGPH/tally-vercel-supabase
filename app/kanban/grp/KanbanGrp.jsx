@@ -337,7 +337,7 @@ export default function KanbanGrpClient() {
                     })
                     .map((participant) => (
                         <div key={participant.id}>
-                            <Link href={`/kanban/grp/${participant.id}`}>
+                            <Link href={`/kanban/clinfo/${participant.id}`}>
                                 <div className="box">
                                     {participant.fullname} <br />
                                     {participant.phone_number} <br />

@@ -1,6 +1,7 @@
 "use client";
 import { use, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import Link from "next/link";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -96,16 +97,18 @@ export default function clientBoard({ params }) {
             <br />
             <h2>{groupName} - {ids.length} pax </h2>
             {items.map(item => (
-              <div className="box" key={item.submission.participant.id}>
-                {item.submission.participant.fullname} <br />
-                {item.submission.participant.phone_number} <br />
-                {item.submission.participant.age} years old <br />
-                {item.submission.participant.health_declaration ? (
-                    <span style={{ color: 'red' }}>{item.submission.participant.health_declaration}</span>
-                ) : (
-                  <span style={{ color: 'blue' }}>No Health Condition</span>
-                )}
-              </div>
+              <Link href={`/kanban/clinfo/${item.submission.participant.id}`} key={item.submission.participant.id}>
+                <div className="box" >
+                  {item.submission.participant.fullname} <br />
+                  {item.submission.participant.phone_number} <br />
+                  {item.submission.participant.age} years old <br />
+                  {item.submission.participant.health_declaration ? (
+                      <span style={{ color: 'red' }}>{item.submission.participant.health_declaration}</span>
+                  ) : (
+                    <span style={{ color: 'blue' }}>No Health Condition</span>
+                  )}
+                </div>
+              </Link>
             ))}
           </div>
         ))}
