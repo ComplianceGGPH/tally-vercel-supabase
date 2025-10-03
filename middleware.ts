@@ -14,5 +14,5 @@ export function middleware(request) {
 
 // Protect specific routes
 export const config = {
-  matcher: '/kanban/grp/:path*',
+  matcher: '/kanban/grp/:path+',
 };
