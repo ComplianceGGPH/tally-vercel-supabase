@@ -11,7 +11,7 @@ export async function POST(request) {
     response.cookies.set('session', 'authenticated', {
         httpOnly: true,
         secure: true, // Always true in production
-        sameSite: 'lax', // Changed from 'strict'
+        sameSite: 'strict', // Changed from 'strict' or 'lax'
         maxAge: 60 * 60,
         path: '/',
     });

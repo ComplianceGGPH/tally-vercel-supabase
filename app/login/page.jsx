@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Login() {
+function LoginForm() {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -25,7 +25,7 @@ export default function Login() {
   };
 
   return (
-    <form onSubmit={handleLogin} className="login-form">
+    <form onSubmit={handleLogin}>
       <input
         type="password"
         value={password}
@@ -34,5 +34,13 @@ export default function Login() {
       />
       <button type="submit">Login</button>
     </form>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
