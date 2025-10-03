@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Login() {
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get('from') || '/kanban';
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -16,7 +18,7 @@ export default function Login() {
     });
 
     if (response.ok) {
-      router.push('/kanban');
+      router.push(from);
     } else {
       alert('Invalid password');
     }
