@@ -180,7 +180,7 @@ export default function ClientBoard({ params }) {
             </div>
           </div>
           <button onClick={printPDF} className="box print:hidden">
-            Print/Download PDF
+            Print/Download PDF test
           </button>
           </div>
         ))
