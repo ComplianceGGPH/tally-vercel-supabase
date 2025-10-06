@@ -65,7 +65,7 @@ export default function ClientBoard({ params }) {
               <h1>Indemnity Form for {submission.participant.fullname} </h1>
             </div>
             <div className="box">
-              <h3 className="text-2xl font-bold">Participant Details</h3>
+              <h3 className="text-2xl font-bold text-center">Participant Details</h3>
               {submission.participant ? (
                 <div>
                   <div className="info-row">
@@ -98,13 +98,13 @@ export default function ClientBoard({ params }) {
                   </div>
                 </div>
               ) : (
-                <p>No participant details available.</p>
+                <p className="text-center">No participant details available.</p>
               )}
             </div>
             
             <div className="submission-container">
               <div className="box">
-                <h3 className="text-2xl font-bold">Submission Details</h3>
+                <h3 className="text-2xl font-bold text-center">Submission Details</h3>
                 <div>
                   <div className="info-row">
                     <span className="info-label">Group</span>
@@ -126,7 +126,7 @@ export default function ClientBoard({ params }) {
               </div>
 
               <div className="box">
-                <h3 className="text-2xl font-bold">Guardian Details</h3>
+                <h3 className="text-2xl font-bold text-center">Guardian Details</h3>
                 {submission.guardian ? (
                   <div>
                     <div className="info-row">
@@ -143,12 +143,12 @@ export default function ClientBoard({ params }) {
                     </div>
                   </div>
                 ) : (
-                  <p>No guardian details available.</p>
+                  <p className="text-center">No guardian details available.</p>
                 )}
               </div>
 
               <div className="box">
-                <h3 className="text-2xl font-bold">Emergency Contact</h3>
+                <h3 className="text-2xl font-bold text-center">Emergency Contact</h3>
                 {submission.emergency_contact ? (
                   <div>
                     <div className="info-row">
@@ -165,12 +165,12 @@ export default function ClientBoard({ params }) {
                     </div>
                   </div>
                 ) : (
-                  <p>No emergency contact details available.</p>
+                  <p className="text-center">No emergency contact details available.</p>
                 )}
               </div>
 
               <div className="box">
-                <h3 className="text-2xl font-bold">Activities</h3>
+                <h3 className="text-2xl font-bold text-center">Activities</h3>
                 {submission.activities && submission.activities.length > 0 ? (
                   <div>
                     {submission.activities.map((activity) => (
@@ -183,7 +183,7 @@ export default function ClientBoard({ params }) {
                     ))}
                   </div>
                 ) : (
-                  <p>No activities available.</p>
+                  <p className="text-center">No activities available.</p>
                 )}
               </div>
             </div>

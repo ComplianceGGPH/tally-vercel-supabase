@@ -160,10 +160,10 @@ body {
   margin-bottom: 2rem;
 }
 
-.submission-container .box{
+.submission-container .box,
+.big-box .box{
   display: flex;
   flex-direction: column;
-  align-items: center; /* vertical centering */
   justify-content: center; /* optional: horizontal centering */
   height: 100%; /* or set a fixed height like 200px */
 }
