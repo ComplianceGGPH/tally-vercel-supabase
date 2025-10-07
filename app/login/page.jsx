@@ -4,20 +4,22 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 function LoginForm() {
   const [password, setPassword] = useState("");
-  const [from, setFrom] = useState("/kanban");
+  const [from, setFrom] = useState(null); // null until hydrated
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Safely read 'from' param after hydration
   useEffect(() => {
     const param = searchParams.get("from");
-    if (param) setFrom(param);
+    setFrom(param || "/kanban");
   }, [searchParams]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!from) return; // wait until 'from' is ready
+
     setIsLoading(true);
 
     const response = await fetch("/api/auth/login", {
@@ -27,7 +29,7 @@ function LoginForm() {
     });
 
     if (response.ok) {
-      router.replace(from); // Changed from router.push to router.replace
+      router.replace(from);
     } else {
       alert("Invalid password");
       setIsLoading(false);
@@ -45,7 +47,7 @@ function LoginForm() {
       <button
         type="submit"
         className="border-2 border-gray-600 rounded-md pl-2 pr-2 border-r"
-        disabled={isLoading}
+        disabled={isLoading || !from}
       >
         {isLoading ? "Logging in..." : "Login"}
       </button>
