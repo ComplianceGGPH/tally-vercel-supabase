@@ -1,6 +1,7 @@
 "use client";
 import { use, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -12,6 +13,16 @@ export default function ClientBoard({ params }) {
   const clientid = decodeURIComponent(rawId);
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const router = useRouter();
+
+  const handleBack = () => {
+    if (window.history.length > 2) {
+      router.back();
+    } else {
+      router.push("/kanban"); // fallback if history is too short
+    }
+  };
 
   // print as PDF
   const printPDF = () => {
@@ -56,6 +67,14 @@ export default function ClientBoard({ params }) {
 
   return (
     <div>
+      <div
+        className="box text-center"
+        style={{ cursor: "pointer" }}
+        onClick={handleBack}
+      >
+        ← Back to Previous Page
+      </div>
+
       {activities.length === 0 ? (
         <p>No activities found.</p>
       ) : (

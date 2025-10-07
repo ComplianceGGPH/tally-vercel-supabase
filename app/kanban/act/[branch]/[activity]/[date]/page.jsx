@@ -90,6 +90,12 @@ export default function clientBoard({ params }) {
 
   return (
     <div>
+      <Link href="/kanban/act" passHref>
+        <div className="box text-center" style={{ cursor: 'pointer' }}>
+          Back to Kanban / Board Selection
+        </div>
+      </Link>
+      
       <h2 className="groupName"> {activity}, {branch} </h2>
       <div className="board">
         {Object.entries(grouped).map(([groupName, {items, ids}]) => (

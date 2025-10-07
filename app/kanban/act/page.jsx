@@ -13,20 +13,46 @@ function KanbanActClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // initialize state from URL if available
   const [branchDropdown, setBranchDropdown] = useState(
     searchParams.get("branch") || "GOPENG GLAMPING PARK"
   );
   const [actDate, setActDate] = useState(searchParams.get("date") || "");
   const [activities, setActivities] = useState([]);
-  const [dayName, setDayName] = useState('');
+  const [dayName, setDayName] = useState("");
+
+  // Load saved values from localStorage
+  useEffect(() => {
+    const savedDate = localStorage.getItem("actDate");
+    const savedBranch = localStorage.getItem("branchDropdown");
+
+    if (savedDate) {
+      setActDate(savedDate);
+      const day = new Date(savedDate).toLocaleDateString("en-US", {
+        weekday: "long",
+      });
+      setDayName(day);
+    }
+
+    if (savedBranch) {
+      setBranchDropdown(savedBranch);
+    }
+  }, []);
 
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
     setActDate(selectedDate);
+    localStorage.setItem("actDate", selectedDate);
 
-    const day = new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' });
+    const day = new Date(selectedDate).toLocaleDateString("en-US", {
+      weekday: "long",
+    });
     setDayName(day);
+  };
+
+  const handleBranchChange = (e) => {
+    const selectedBranch = e.target.value;
+    setBranchDropdown(selectedBranch);
+    localStorage.setItem("branchDropdown", selectedBranch);
   };
 
   useEffect(() => {
@@ -59,15 +85,13 @@ function KanbanActClient() {
     fetchData();
   }, [branchDropdown, actDate]);
 
-  // update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
     if (branchDropdown) params.set("branch", branchDropdown);
     if (actDate) params.set("date", actDate);
 
-    // CURRENT ROUTE PLEASE
     router.push(`/kanban/act?${params.toString()}`, { scroll: false });
-  }, [branchDropdown, actDate, router]);
+  }, [branchDropdown, actDate]);
 
   const grouped = activities.reduce((acc, item) => {
     const key = item.activity_time || "No Time";
@@ -82,7 +106,7 @@ function KanbanActClient() {
       acc[key] = {
         items: [],
         ids: [],
-        groups: []
+        groups: [],
       };
     }
 
@@ -93,10 +117,8 @@ function KanbanActClient() {
     return acc;
   }, {});
 
-  // Helper to convert 24h time to 12h format
   function formatTo12Hour(timeStr) {
     if (!timeStr || timeStr === "No Time") return timeStr;
-    // Handles "HH:mm" or "HH:mm:ss"
     const [h, m] = timeStr.split(":");
     let hour = parseInt(h, 10);
     const minute = m || "00";
@@ -109,10 +131,11 @@ function KanbanActClient() {
     <div className="container">
       <h2>Activity Board Page</h2>
       <Link href="/kanban" passHref>
-        <div className="box text-center" style={{ cursor: 'pointer' }}>
+        <div className="box text-center" style={{ cursor: "pointer" }}>
           Back to Kanban / Board Selection
         </div>
       </Link>
+
       <div className="branchDateInput">
         <div>
           <label htmlFor="branchDropdown">Choose Branch : </label>
@@ -120,7 +143,7 @@ function KanbanActClient() {
             id="branchDropdown"
             className="branchDropdown"
             value={branchDropdown}
-            onChange={(e) => setBranchDropdown(e.target.value)}
+            onChange={handleBranchChange}
           >
             <option value="GOPENG GLAMPING PARK">GGP</option>
             <option value="GLAMPING @ WETLAND PUTRAJAYA">GLOW</option>
@@ -131,15 +154,17 @@ function KanbanActClient() {
           </select>
         </div>
         <div>
-            <label htmlFor="actDate">Date : </label>
-            <input
-                type="date"
-                id="actDate"
-                name="actDate"
-                value={actDate}
-                onChange={handleDateChange}
-            />
-            {dayName && <span style={{ marginLeft: '10px' }}>( {dayName} )</span>}
+          <label htmlFor="actDate">Date : </label>
+          <input
+            type="date"
+            id="actDate"
+            name="actDate"
+            value={actDate}
+            onChange={handleDateChange}
+          />
+          {dayName && (
+            <span style={{ marginLeft: "10px" }}>( {dayName} )</span>
+          )}
         </div>
       </div>
 
@@ -160,14 +185,20 @@ function KanbanActClient() {
                   {[...new Set(items.map((i) => i.activity_name))].map(
                     (actName) => (
                       <div className="box actBox" key={actName}>
-                        <Link href={`/kanban/act/${branchDropdown}/${actName}/${actDate}`}>
+                        <Link
+                          href={`/kanban/act/${branchDropdown}/${actName}/${actDate}`}
+                        >
                           {actName}
                         </Link>
                         {CountClientInAct[actName] && (
                           <div className="paxgrpCount">
-                            <span style={{ color: 'green' }}>
+                            <span style={{ color: "green" }}>
                               {CountClientInAct[actName].ids.length} pax <br />
-                              {new Set(CountClientInAct[actName].groups).size} grp
+                              {
+                                new Set(
+                                  CountClientInAct[actName].groups
+                                ).size
+                              } grp
                             </span>
                           </div>
                         )}

@@ -11,6 +11,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
     "axios": "^1.12.2",
+    "js-cookie": "^3.0.5",
     "libphonenumber-js": "^1.12.17",
     "next": "15.5.3",
     "react": "19.1.0",

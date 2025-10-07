@@ -147,11 +147,21 @@ function KanbanGrpClientForm() {
     const handleDateChange = (e) => {
         const selectedDate = e.target.value;
         setActDate(selectedDate);
+        localStorage.setItem('actDate', selectedDate); // ✅ Save to localStorage
 
         const day = new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' });
         setDayName(day);
     };
-    
+
+    useEffect(() => {
+        const savedDate = localStorage.getItem('actDate');
+        if (savedDate) {
+            setActDate(savedDate);
+            const day = new Date(savedDate).toLocaleDateString('en-US', { weekday: 'long' });
+            setDayName(day);
+        }
+    }, []);
+
     const grouped = activities.reduce((acc, item) => {
         const key = item.activity_date || "No Date";
         if (!acc[key]) acc[key] = [];

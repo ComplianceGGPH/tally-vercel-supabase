@@ -68,20 +68,29 @@ body {
   background-color: #1b1b1b;
   color: whitesmoke;
   border-radius: 8px;
-  width: 250px;
+  width: 50%;
+  margin: 0 auto;
 }
 
 .main-page .box,
 .indemnity-container .box {
-  width: 500px;
+  width: 100%;
 }
 
 .logo-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* default: 3 columns */
+  gap: 16px;
+  justify-items: center;
+  padding: 20px;
 }
+
+@media (min-width: 768px) {
+  .logo-container {
+    grid-template-columns: repeat(6, 1fr); /* 1 row of 6 logos */
+  }
+}
+
 
 .groupName {
   text-align: center;
@@ -110,7 +119,7 @@ body {
   gap: 16px;       /* spacing between columns */
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 2%;
 }
 
 .activities-container {
