@@ -27,7 +27,7 @@ function LoginForm() {
     });
 
     if (response.ok) {
-      router.push(from);
+      router.replace(from); // Changed from router.push to router.replace
     } else {
       alert("Invalid password");
       setIsLoading(false);
