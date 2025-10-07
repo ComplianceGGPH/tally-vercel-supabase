@@ -1,18 +1,18 @@
+import Image from "next/image";
 import Link from "next/link";
+import styles from './styles/Home.module.css';
 
 export default function Home() {
   return (
-    <div>
-
-      <div>
-        <h1>Welcome to GGPH Kanban Board</h1>
-        <p>Please choose how you want to sort the participants</p>
-        <p>*click on any of below</p> <br />
+    <div className={`main-page ${styles['bg-section']}`}>
+      <div className="text-center">
+        <Image src="/logo/ggph.png" alt="GGPH Logo" width={500} height={150} />
+        <h1>Welcome to GGPH Board</h1> <br />
       </div>
 
       <Link href="/kanban" passHref>
         <div className="box text-center" style={{ cursor: 'pointer' }}>
-          Go to Kanban Board
+          Indemnity Form
         </div>
       </Link>
     </div>

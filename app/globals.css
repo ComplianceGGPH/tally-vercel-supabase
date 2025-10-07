@@ -11,6 +11,7 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
+
 /* 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -24,6 +25,17 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.indemnity-container,  .main-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Full viewport height */
+  width: 100vw;  /* Full viewport width */
+  gap: 10px;
+  padding: 20px;
 }
 
 .board {
@@ -43,9 +55,32 @@ body {
   border: 1px solid #000000;
   padding: 10px;
   margin-bottom: 10px;
-  background-color: rgb(17, 24, 24);
+  background-color: #1b1b1b;
   color: whitesmoke;
   border-radius: 8px;
+}
+
+.shortbox{
+  flex: 1;         /* make columns expand equally */
+  border: 1px solid #000000;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #1b1b1b;
+  color: whitesmoke;
+  border-radius: 8px;
+  width: 250px;
+}
+
+.main-page .box,
+.indemnity-container .box {
+  width: 500px;
+}
+
+.logo-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .groupName {
