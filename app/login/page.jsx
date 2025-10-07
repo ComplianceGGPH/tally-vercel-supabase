@@ -8,9 +8,12 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const from = searchParams.get('from') || '/kanban';
 
+  const [isLoading, setIsLoading] = useState(false);
+  
   const handleLogin = async (e) => {
     e.preventDefault();
-    
+    setIsLoading(true);
+
     const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -21,6 +24,7 @@ function LoginForm() {
       router.push(from);
     } else {
       alert('Invalid password');
+      setIsLoading(false);
     }
   };
 
@@ -32,7 +36,10 @@ function LoginForm() {
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Enter password"
       />
-      <button type="submit">Login</button>
+      <button type="submit" className="border-2 border-gray-600 rounded-md pl-2 pr-2 border-r" disabled={isLoading}>
+        {isLoading ? "Logging in..." : "Login"}
+      </button>
+
     </form>
   );
 }
