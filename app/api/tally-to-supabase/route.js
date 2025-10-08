@@ -98,7 +98,7 @@ export async function POST(request) {
           nationality: answers["nationality"] || null,
           phone_number: answers["phonenumber"] || null,
           email: answers["email"] || null,
-          address: full_address || null,
+          full_address: full_address || null,
           line_address: answers["lineaddress"] || null,
           postcode: answers["postcode"] || null,
           city: answers["city"] || null,
