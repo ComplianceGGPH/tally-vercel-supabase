@@ -78,6 +78,14 @@ export async function POST(request) {
     const answers = parseAnswers(payload.data.fields);
     console.log("Mapped answers:", answers);
 
+    const full_address = [
+      answers["lineaddress"],
+      answers["postcode"],
+      answers["city"],
+      answers["state"]
+    ].filter(Boolean).join(", ");
+
+
     // --- 1. Participant ---
     const { data: participant, error: pErr } = await supabase
       .from("participants")
@@ -90,7 +98,11 @@ export async function POST(request) {
           nationality: answers["nationality"] || null,
           phone_number: answers["phonenumber"] || null,
           email: answers["email"] || null,
-          address: answers["address"] || null,
+          address: full_address || null,
+          line_address: answers["lineaddress"] || null,
+          postcode: answers["postcode"] || null,
+          city: answers["city"] || null,
+          state: answers["state"] || null,
           gender: answers["gender"] || null,
           race: answers["race"] || null,
           health_declaration: answers["healthdeclaration"] || null,
@@ -254,21 +266,19 @@ export async function POST(request) {
     // InsuranceData.branch = "PUTRAJAYA WETLAND ADVENTURE PARK";
     // insuranceRes = await createPolicy(InsuranceData);
 
-    if (answers["age"] >= 6) {
+    // disabled for testing purposes
+    // if (answers["age"] >= 6) {
+    //   console.log("Creating insurance");w
+    //   console.log("Prepared insurance data", InsuranceData);
 
-      console.log("Creating insurance");
-      console.log("Prepared insurance data", InsuranceData);
-
-      // Deicde which promo to use based on branch
-      if (InsuranceData.branch === "GOPENG GLAMPING PARK") {
-        insuranceRes = await createPolicy(InsuranceData);
-      } else {
-        InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
-        insuranceRes = await createPolicy(InsuranceData);
-      }
-
-
-    }
+    //   // Deicde which promo to use based on branch
+    //   if (InsuranceData.branch === "GOPENG GLAMPING PARK") {
+    //     insuranceRes = await createPolicy(InsuranceData);
+    //   } else {
+    //     InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
+    //     insuranceRes = await createPolicy(InsuranceData);
+    //   }
+    // }
 
     console.log("Prepared insurance data");
     console.log("Insurance response:", insuranceRes);
