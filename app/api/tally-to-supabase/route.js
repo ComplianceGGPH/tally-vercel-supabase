@@ -248,7 +248,7 @@ export async function POST(request) {
         number,
       },
       email: answers["guardianemail"] || answers["email"],
-      address: answers["address"],
+      address: full_address,
       nric: answers["nric"],
       nationality: nationalityCode || "MY",
 
