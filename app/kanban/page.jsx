@@ -23,7 +23,7 @@ export default function Kanban() {
       <h1 className="font-bold">INDEMNITY FORM</h1>
       <p>Choose sort by group or activity</p>
       
-      <div className="container items-center">
+      <div className="container">
         <Link href={`/kanban/grp`} passHref >
           <div className="box text-center">
               Group Selection

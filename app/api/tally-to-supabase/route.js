@@ -267,7 +267,7 @@ export async function POST(request) {
     // insuranceRes = await createPolicy(InsuranceData);
 
     if (answers["age"] >= 6) {
-      console.log("Creating insurance");w
+      console.log("Creating insurance");
       console.log("Prepared insurance data", InsuranceData);
 
       // Deicde which promo to use based on branch
