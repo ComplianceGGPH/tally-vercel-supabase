@@ -266,19 +266,18 @@ export async function POST(request) {
     // InsuranceData.branch = "PUTRAJAYA WETLAND ADVENTURE PARK";
     // insuranceRes = await createPolicy(InsuranceData);
 
-    // disabled for testing purposes
-    // if (answers["age"] >= 6) {
-    //   console.log("Creating insurance");w
-    //   console.log("Prepared insurance data", InsuranceData);
+    if (answers["age"] >= 6) {
+      console.log("Creating insurance");w
+      console.log("Prepared insurance data", InsuranceData);
 
-    //   // Deicde which promo to use based on branch
-    //   if (InsuranceData.branch === "GOPENG GLAMPING PARK") {
-    //     insuranceRes = await createPolicy(InsuranceData);
-    //   } else {
-    //     InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
-    //     insuranceRes = await createPolicy(InsuranceData);
-    //   }
-    // }
+      // Deicde which promo to use based on branch
+      if (InsuranceData.branch === "GOPENG GLAMPING PARK") {
+        insuranceRes = await createPolicy(InsuranceData);
+      } else {
+        InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
+        insuranceRes = await createPolicy(InsuranceData);
+      }
+    }
 
     console.log("Prepared insurance data");
     console.log("Insurance response:", insuranceRes);
