@@ -20,6 +20,62 @@
   }
 } */
 
+/* Force dark styling on form elements */
+select, 
+input, 
+textarea,
+option {
+  background-color: #1b1b1b;
+  color: #ededed;
+  border: 1px solid #333;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+/* Specifically for select dropdowns */
+select {
+  appearance: none; /* Remove default arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ededed' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 30px;
+}
+
+/* Dropdown options */
+select option {
+  background-color: #1b1b1b;
+  color: #ededed;
+}
+
+/* Focus states */
+select:focus,
+input:focus,
+textarea:focus {
+  outline: 2px solid #4a4a4a;
+  outline-offset: 2px;
+}
+
+/* For disabled states */
+select:disabled,
+input:disabled,
+textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button {
+  background-color: #2a2a2a;
+  color: #ededed;
+  border: 1px solid #333;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #3a3a3a;
+}
+
 body {
   flex: 1;
   background: var(--background);
