@@ -111,8 +111,8 @@ function KanbanActClient() {
     }
 
     acc[key].items.push(item);
-    acc[key].ids.push(item.submission.participant.id);
-    acc[key].groups.push(item.submission.group);
+    acc[key].ids.push(item.submission?.participant?.id || "Unknown");
+    acc[key].groups.push(item.submission?.group || "No group");
 
     return acc;
   }, {});
