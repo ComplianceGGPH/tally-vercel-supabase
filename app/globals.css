@@ -133,6 +133,7 @@ body {
 
 .box{
   flex: 1;         /* make columns expand equally */
+  min-width: 200px;
   border: 1px solid #000000;
   padding: 10px;
   margin-bottom: 10px;
@@ -266,6 +267,7 @@ body {
 .column {
   /* enable scrolling */
   overflow: auto;     /* allows both horizontal + vertical */
+  min-width: 200px;
   /* or: overflow-x: auto; overflow-y: auto; */
 }
 

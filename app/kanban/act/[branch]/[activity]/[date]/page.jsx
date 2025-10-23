@@ -83,7 +83,7 @@ export default function clientBoard({ params }) {
     }
 
     acc[key].items.push(item);
-    acc[key].ids.push(item.submission.participant.id);
+    acc[key].ids.push(item.submission?.participant?.id || "Unknown");
 
     return acc;
   }, {});
@@ -102,20 +102,30 @@ export default function clientBoard({ params }) {
           <div className="column" key={groupName}>
             <br />
             <h2>{groupName} - {ids.length} pax </h2>
-            {items.map(item => (
-              <Link href={`/kanban/clinfo/${item.submission.participant.id}`} key={item.submission.participant.id}>
-                <div className="box" >
-                  {item.submission.participant.fullname} <br />
-                  {item.submission.participant.phone_number} <br />
-                  {item.submission.participant.age} years old <br />
-                  {item.submission.participant.health_declaration ? (
-                      <span style={{ color: 'red' }}>{item.submission.participant.health_declaration}</span>
-                  ) : (
-                    <span style={{ color: 'blue' }}>No Health Condition</span>
-                  )}
-                </div>
-              </Link>
-            ))}
+            {items.map((item, i) => {
+              const participant = item.submission?.participant;
+              if (!participant) return null; // skip if missing submission/participant
+
+              return (
+                <Link
+                  href={`/kanban/clinfo/${participant.id}`}
+                  key={participant.id || i}
+                >
+                  <div className="box">
+                    {participant.fullname} <br />
+                    {participant.phone_number} <br />
+                    {participant.age} years old <br />
+                    {participant.health_declaration ? (
+                      <span style={{ color: 'red' }}>
+                        {participant.health_declaration}
+                      </span>
+                    ) : (
+                      <span style={{ color: 'blue' }}>No Health Condition</span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         ))}
       </div>

@@ -58,13 +58,14 @@ function KanbanActClient() {
   useEffect(() => {
     async function fetchData() {
       if (!branchDropdown || !actDate) return;
+
       const { data, error } = await supabase
         .from("activities")
         .select(`
           activity_name,
           activity_time,
           activity_date,
-          submission:submission_id(
+          submission:submission_id!inner(
             id,
             branch,
             group,
@@ -82,6 +83,7 @@ function KanbanActClient() {
       if (error) console.error(error);
       else setActivities(data || []);
     }
+
     fetchData();
   }, [branchDropdown, actDate]);
 
