@@ -325,20 +325,31 @@ function KanbanGrpClientForm() {
             {/* Display Participant */}
             <div className="participants-container">
                 {activities.length > 0 ? (
-                    // Get unique participants by ID, then sort with health condition at the top
+                    // Get unique participants by ID, then sort with health condition and no insurance at the top
                     [...new Map(
                         activities.map(activity => [
                             activity.submission.participant.id,
-                            activity.submission.participant
+                            {
+                                participant: activity.submission.participant,
+                                insurance: activity.submission.yas_insurance
+                            }
                         ])
                     ).values()]
                     .sort((a, b) => {
-                        // Put those with health_declaration (truthy) at the top
-                        if (a.health_declaration && !b.health_declaration) return -1;
-                        if (!a.health_declaration && b.health_declaration) return 1;
+                        const aHasHealth = a.participant.health_declaration;
+                        const bHasHealth = b.participant.health_declaration;
+                        const aNoInsurance = a.insurance?.toLowerCase() === 'no insurance';
+                        const bNoInsurance = b.insurance?.toLowerCase() === 'no insurance';
+                        
+                        // Priority: health declaration or no insurance
+                        const aPriority = aHasHealth || aNoInsurance;
+                        const bPriority = bHasHealth || bNoInsurance;
+                        
+                        if (aPriority && !bPriority) return -1;
+                        if (!aPriority && bPriority) return 1;
                         return 0;
                     })
-                    .map((participant) => (
+                    .map(({participant, insurance}) => (
                         <div key={participant.id}>
                             <Link href={`/kanban/clinfo/${participant.id}`}>
                                 <div className="box">
@@ -351,6 +362,11 @@ function KanbanGrpClientForm() {
                                         </span>
                                     ) : (
                                         <span style={{ color: 'blue' }}>No Health Condition</span>
+                                    )}
+                                    {insurance && (
+                                        <div>
+                                            <em>Insurance:</em> {insurance}
+                                        </div>
                                     )}
                                 </div>
                             </Link>

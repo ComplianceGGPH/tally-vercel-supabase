@@ -267,22 +267,38 @@ export async function POST(request) {
     // insuranceRes = await createPolicy(InsuranceData);
 
     if (answers["age"] >= 6) {
-      console.log("Creating insurance");
-      console.log("Prepared insurance data", InsuranceData);
+    console.log("Creating insurance");
+    console.log("Prepared insurance data", InsuranceData);
 
-      // Deicde which promo to use based on branch
-      if (InsuranceData.branch === "GOPENG GLAMPING PARK") {
-        insuranceRes = await createPolicy(InsuranceData);
-      } else {
-        InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
-        insuranceRes = await createPolicy(InsuranceData);
-      }
+    // Decide which promo to use based on branch
+    if (InsuranceData.branch === "GOPENG GLAMPING PARK") {
+      insuranceRes = await createPolicy(InsuranceData);
+    } else {
+      InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
+      insuranceRes = await createPolicy(InsuranceData);
     }
 
-    console.log("Prepared insurance data");
     console.log("Insurance response:", insuranceRes);
 
-    return Response.json({ success: true });
+    // ✅ Extract product name if available
+    const insuranceData = Array.isArray(insuranceRes) ? insuranceRes[0] : null;
+    const insuranceProduct = insuranceData?.productId || "no insurance";
+
+    // ✅ Update submissions table
+    const { error } = await supabase
+      .from("submissions")
+      .update({ yas_insurance: insuranceProduct })
+      .eq("id", submission.id); // adjust if your key is different
+
+    if (error) throw error;
+
+    console.log("Insurance info saved:", insuranceProduct);
+  }
+
+  console.log("Prepared insurance data");
+  console.log("Insurance response:", insuranceRes);
+
+  return Response.json({ success: true });
   } catch (err) {
     console.error("Webhook error:", err);
     return Response.json({ error: err.message }, { status: 500 });

@@ -36,6 +36,7 @@ export default function clientBoard({ params }) {
             id,
             branch,
             group,
+            yas_insurance,
             participant:participant_id(
               id,
               fullname,
@@ -98,36 +99,59 @@ export default function clientBoard({ params }) {
       
       <h2 className="groupName"> {activity}, {branch} </h2>
       <div className="board">
-        {Object.entries(grouped).map(([groupName, {items, ids}]) => (
-          <div className="column" key={groupName}>
-            <br />
-            <h2>{groupName} - {ids.length} pax </h2>
-            {items.map((item, i) => {
-              const participant = item.submission?.participant;
-              if (!participant) return null; // skip if missing submission/participant
+        {Object.entries(grouped).map(([groupName, {items, ids}]) => {
+          // Sort items: health declarations and no insurance first
+          const sortedItems = [...items].sort((a, b) => {
+            const aHasHealth = a.submission?.participant?.health_declaration;
+            const bHasHealth = b.submission?.participant?.health_declaration;
+            const aNoInsurance = a.submission?.yas_insurance?.toLowerCase() === 'no insurance';
+            const bNoInsurance = b.submission?.yas_insurance?.toLowerCase() === 'no insurance';
+            
+            // Priority: health declaration or no insurance
+            const aPriority = aHasHealth || aNoInsurance;
+            const bPriority = bHasHealth || bNoInsurance;
+            
+            if (aPriority && !bPriority) return -1;
+            if (!aPriority && bPriority) return 1;
+            return 0;
+          });
 
-              return (
-                <Link
-                  href={`/kanban/clinfo/${participant.id}`}
-                  key={participant.id || i}
-                >
-                  <div className="box">
-                    {participant.fullname} <br />
-                    {participant.phone_number} <br />
-                    {participant.age} years old <br />
-                    {participant.health_declaration ? (
-                      <span style={{ color: 'red' }}>
-                        {participant.health_declaration}
-                      </span>
-                    ) : (
-                      <span style={{ color: 'blue' }}>No Health Condition</span>
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        ))}
+          return (
+            <div className="column" key={groupName}>
+              <br />
+              <h2>{groupName} - {ids.length} pax </h2>
+              {sortedItems.map((item, i) => {
+                const participant = item.submission?.participant;
+                if (!participant) return null; // skip if missing submission/participant
+
+                return (
+                  <Link
+                    href={`/kanban/clinfo/${participant.id}`}
+                    key={participant.id || i}
+                  >
+                    <div className="box">
+                      {participant.fullname} <br />
+                      {participant.phone_number} <br />
+                      {participant.age} years old <br />
+                      {participant.health_declaration ? (
+                        <span style={{ color: 'red' }}>
+                          {participant.health_declaration}
+                        </span>
+                      ) : (
+                        <span style={{ color: 'blue' }}>No Health Condition</span>
+                      )}
+                      {item.submission?.yas_insurance && (
+                        <div>
+                          <em>Insurance:</em> {item.submission.yas_insurance}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
