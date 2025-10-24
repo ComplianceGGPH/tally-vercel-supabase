@@ -81,57 +81,52 @@ function KanbanGrpClientForm() {
     useEffect(() => {
         async function fetchData() {
             console.log("🔄 fetchData triggered with:", { 
-                branchDropdown, 
-                actDate, 
-                groupDropdown 
+            branchDropdown, 
+            actDate, 
+            groupDropdown 
             });
             
             if (!branchDropdown || !actDate || !groupDropdown) {
-                console.log("⏭️ Skipping fetch - missing filters");
-                setActivities([]);
-                return;
+            console.log("⏭️ Skipping fetch - missing filters");
+            setActivities([]);
+            return;
             }
             
             console.log("📡 Fetching activities...");
             
             const { data, error } = await supabase
-                .from("activities")
-                .select(`
-                    activity_name,
-                    activity_time,
-                    activity_date,
-                    submission:submission_id(
-                        id,
-                        branch,
-                        group,
-                        participant:participant_id(
-                            id,
-                            fullname,
-                            health_declaration,
-                            phone_number,
-                            age
-                        )
-                    )
-                `)
-                .eq("submission.branch", branchDropdown)
-                // .eq("submission.group", groupDropdown);
+            .from("activities")
+            .select(`
+                activity_name,
+                activity_time,
+                activity_date,
+                submission:submission_id!inner(
+                id,
+                branch,
+                group,
+                participant:participant_id(
+                    id,
+                    fullname,
+                    health_declaration,
+                    phone_number,
+                    age
+                )
+                )
+            `)
+            // .eq("submission.branch", branchDropdown)
+            .eq("submission.group", groupDropdown)
+            // .eq("activity_date", actDate);
 
             if (error) {
-                console.error("❌ Error fetching activities:", error);
+            console.error("❌ Error fetching activities:", error);
             } else {
-                // Filter the data by group AFTER fetching
-                const filteredActivities = data.filter(
-                    activity => activity.submission?.group === groupDropdown
-                );
-                
-                console.log("✅ Filtered to", filteredActivities.length, "activities for group:", groupDropdown);
-                
-                // Use filteredActivities instead of data
-                setActivities(filteredActivities);
+            console.log("✅ Found", data.length, "activities for filters:", { branchDropdown, actDate, groupDropdown });
+            setActivities(data || []);
             }
         }
+
         fetchData();
-    }, [branchDropdown, actDate, groupDropdown]);
+        }, [branchDropdown, actDate, groupDropdown]);
 
     // update URL when filters change
     useEffect(() => {
