@@ -104,6 +104,7 @@ function KanbanGrpClientForm() {
                 id,
                 branch,
                 group,
+                yas_insurance,
                 participant:participant_id(
                     id,
                     fullname,
