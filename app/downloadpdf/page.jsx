@@ -168,14 +168,14 @@ const downloadSinglePDF = async (submissionId, participantName) => {
                 {submissions.map((submission) => (
                   <tr key={submission.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm text-black">{submission.participants?.fullname}</td>
-                    <td className="px-4 py-3 text-sm">{submission.participants?.nric}</td>
+                    <td className="px-4 py-3 text-sm text-black">{submission.participants?.nric}</td>
                     <td className="px-4 py-3 text-sm">
                       <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
                         {submission.group || 'N/A'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm">{submission.branch}</td>
-                    <td className="px-4 py-3 text-sm">
+                    <td className="px-4 py-3 text-sm text-black">{submission.branch}</td>
+                    <td className="px-4 py-3 text-sm text-black">
                       {submission.activities?.[0]?.activity_name || 'N/A'}
                     </td>
                     <td className="px-4 py-3 text-sm">
