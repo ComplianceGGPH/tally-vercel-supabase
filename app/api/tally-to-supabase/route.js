@@ -274,8 +274,11 @@ export async function POST(request) {
     if (InsuranceData.branch === "GOPENG GLAMPING PARK") {
       insuranceRes = await createPolicy(InsuranceData);
     } else {
-      InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
-      insuranceRes = await createPolicy(InsuranceData);
+      // makes it so that only stay in guest can receive insurance
+      if (answers["bookingstatus"] == "Stay In Guest / Tetamu Menginap") {
+        InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
+        insuranceRes = await createPolicy(InsuranceData);
+      }
     }
 
     console.log("Insurance response:", insuranceRes);
