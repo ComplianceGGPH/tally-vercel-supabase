@@ -14,7 +14,7 @@
     "axios": "^1.12.2",
     "js-cookie": "^3.0.5",
     "libphonenumber-js": "^1.12.17",
-    "next": "15.5.3",
+    "next": "15.5.9",
     "puppeteer-core": "^24.29.1",
     "react": "19.1.0",
     "react-dom": "19.1.0"
