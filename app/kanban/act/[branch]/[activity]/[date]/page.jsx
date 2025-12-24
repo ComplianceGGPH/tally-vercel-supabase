@@ -2,6 +2,9 @@
 import { use, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -90,68 +93,89 @@ export default function clientBoard({ params }) {
   }, {});
 
   return (
-    <div>
-      <Link href="/kanban/act" passHref>
-        <div className="box text-center" style={{ cursor: 'pointer' }}>
-          Back to Kanban / Board Selection
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold tracking-tight">{activity}</h1>
+            <p className="text-muted-foreground">{branch} - {date}</p>
+          </div>
+          <Link href="/kanban/act">
+            <Button variant="outline">
+              ← Back to Activities
+            </Button>
+          </Link>
         </div>
-      </Link>
       
-      <h2 className="groupName"> {activity}, {branch} </h2>
-      <div className="board">
-        {Object.entries(grouped).map(([groupName, {items, ids}]) => {
-          // Sort items: health declarations and no insurance first
-          const sortedItems = [...items].sort((a, b) => {
-            const aHasHealth = a.submission?.participant?.health_declaration;
-            const bHasHealth = b.submission?.participant?.health_declaration;
-            const aNoInsurance = a.submission?.yas_insurance?.toLowerCase() === 'no insurance';
-            const bNoInsurance = b.submission?.yas_insurance?.toLowerCase() === 'no insurance';
-            
-            // Priority: health declaration or no insurance
-            const aPriority = aHasHealth || aNoInsurance;
-            const bPriority = bHasHealth || bNoInsurance;
-            
-            if (aPriority && !bPriority) return -1;
-            if (!aPriority && bPriority) return 1;
-            return 0;
-          });
+      {/* Horizontal scrollable container for groups */}
+      <div className="overflow-x-auto pb-4">
+        <div className="flex gap-6 min-w-max">
+          {Object.entries(grouped).map(([groupName, {items, ids}]) => {
+            // Sort items: health declarations and no insurance first
+            const sortedItems = [...items].sort((a, b) => {
+              const aHasHealth = a.submission?.participant?.health_declaration;
+              const bHasHealth = b.submission?.participant?.health_declaration;
+              const aNoInsurance = a.submission?.yas_insurance?.toLowerCase() === 'no insurance';
+              const bNoInsurance = b.submission?.yas_insurance?.toLowerCase() === 'no insurance';
+              
+              // Priority: health declaration or no insurance
+              const aPriority = aHasHealth || aNoInsurance;
+              const bPriority = bHasHealth || bNoInsurance;
+              
+              if (aPriority && !bPriority) return -1;
+              if (!aPriority && bPriority) return 1;
+              return 0;
+            });
 
-          return (
-            <div className="column" key={groupName}>
-              <br />
-              <h2>{groupName} - {ids.length} pax </h2>
-              {sortedItems.map((item, i) => {
-                const participant = item.submission?.participant;
-                if (!participant) return null; // skip if missing submission/participant
+            return (
+              <Card key={groupName} className="w-80 flex-shrink-0 shadow-md">
+                <CardContent className="p-4 space-y-4">
+                  <div className="flex items-center justify-between border-b pb-3">
+                    <h2 className="text-xl font-semibold">{groupName}</h2>
+                    <Badge variant="secondary">{ids.length} pax</Badge>
+                  </div>
+                  
+                  {/* Scrollable participant list */}
+                  <div className="h-[calc(100vh-18rem)] overflow-y-auto pr-2 space-y-2">
+                    {sortedItems.map((item, i) => {
+                      const participant = item.submission?.participant;
+                      if (!participant) return null; // skip if missing submission/participant
 
-                return (
-                  <Link
-                    href={`/kanban/clinfo/${participant.id}`}
-                    key={participant.id || i}
-                  >
-                    <div className="box">
-                      {participant.fullname} <br />
-                      {participant.phone_number} <br />
-                      {participant.age} years old <br />
-                      {participant.health_declaration ? (
-                        <span style={{ color: 'red' }}>
-                          {participant.health_declaration}
-                        </span>
-                      ) : (
-                        <span style={{ color: 'blue' }}>No Health Condition</span>
-                      )}
-                      {item.submission?.yas_insurance && (
-                        <div>
-                          <em>Insurance:</em> {item.submission.yas_insurance}
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          );
-        })}
+                      return (
+                        <Link
+                          href={`/kanban/clinfo/${participant.id}`}
+                          key={participant.id || i}
+                        >
+                          <Card className="hover:shadow-lg transition-all hover:border-primary border-2">
+                            <CardContent className="p-4">
+                              <div className="font-medium">{participant.fullname}</div>
+                              <div className="text-sm text-muted-foreground">{participant.phone_number}</div>
+                              <div className="text-sm">{participant.age} years old</div>
+                              {participant.health_declaration ? (
+                                <Badge variant="destructive" className="mt-2 whitespace-normal text-left break-words">
+                                  {participant.health_declaration}
+                                </Badge>
+                              ) : (
+                                <Badge variant="secondary" className="mt-2">No Health Condition</Badge>
+                              )}
+                              {item.submission?.yas_insurance && (
+                                <div className="text-sm mt-2">
+                                  <em>Insurance:</em> {item.submission.yas_insurance}
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
       </div>
     </div>
   );

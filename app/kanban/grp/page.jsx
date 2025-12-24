@@ -3,6 +3,10 @@ import { useEffect, useState, Suspense } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -169,70 +173,93 @@ function KanbanGrpClientForm() {
                             .length;
 
     return (
-        <div className="container">
-            <Link href="/kanban" passHref>
-                <div className="box text-center" style={{ cursor: 'pointer' }}>
-                Back to Kanban / Board Selection
-                </div>
-            </Link>
-
-            <div className="branchDateInput">
-                <div>
-                    <label htmlFor="branchDropdown">Choose Branch : </label>
-                    <select
-                        id="branchDropdown"
-                        className="branchDropdown"
-                        value={branchDropdown}
-                        onChange={(e) => setBranchDropdown(e.target.value)}
-                    >
-                        <option value="GOPENG GLAMPING PARK">GGP</option>
-                        <option value="GLAMPING @ WETLAND PUTRAJAYA">GLOW</option>
-                        <option value="PUTRAJAYA LAKE RECREATION CENTER">PLRC</option>
-                        <option value="PUTRAJAYA WETLAND ADVENTURE PARK">PWAP</option>
-                        <option value="BOTANI">BOTANI</option>
-                        <option value="GCT EVENTS">GCT EVENTS</option>
-                    </select>
+        <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+            <div className="max-w-7xl mx-auto p-6 space-y-6">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                        <h1 className="text-3xl font-bold tracking-tight">Group Board</h1>
+                        <p className="text-muted-foreground">View participants organized by groups</p>
+                    </div>
+                    <Link href="/kanban">
+                        <Button variant="outline">
+                            ← Back to Selection
+                        </Button>
+                    </Link>
                 </div>
 
-                <div>
-                    <label htmlFor="actDate">Date : </label>
-                    <input
-                        type="date"
-                        id="actDate"
-                        name="actDate"
-                        value={actDate}
-                        onChange={handleDateChange}
-                    />
-                    {dayName && <span style={{ marginLeft: '10px' }}>( {dayName} )</span>}
-                </div>
+                <Card className="shadow-md">
+                <CardHeader>
+                    <CardTitle>Filter Options</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="branchDropdown" className="text-sm font-medium">Choose Branch</label>
+                        <Select
+                            value={branchDropdown}
+                            onValueChange={setBranchDropdown}
+                        >
+                            <SelectTrigger id="branchDropdown">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="GOPENG GLAMPING PARK">GGP</SelectItem>
+                                <SelectItem value="GLAMPING @ WETLAND PUTRAJAYA">GLOW</SelectItem>
+                                <SelectItem value="PUTRAJAYA LAKE RECREATION CENTER">PLRC</SelectItem>
+                                <SelectItem value="PUTRAJAYA WETLAND ADVENTURE PARK">PWAP</SelectItem>
+                                <SelectItem value="BOTANI">BOTANI</SelectItem>
+                                <SelectItem value="GCT EVENTS">GCT EVENTS</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
 
-                <div>
-                    <label htmlFor="groupDropdown">Choose Group : </label>
-                    <select
-                        id="groupDropdown"
-                        className="groupDropdown"
-                        value={groupDropdown}
-                        onChange={(e) => setGroupDropdown(e.target.value)}
-                        disabled={groups.length === 0}
-                    >
-                        {groups.length === 0 ? (
-                            <option value="">No groups available</option>
-                        ) : (
-                            groups.map((group) => (
-                                <option key={group} value={group}>
-                                    {group}
-                                </option>
-                            ))
-                        )}
-                    </select>
-                </div>
-            </div>
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="actDate" className="text-sm font-medium">Date</label>
+                        <input
+                            type="date"
+                            id="actDate"
+                            name="actDate"
+                            value={actDate}
+                            onChange={handleDateChange}
+                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
+                        />
+                        {dayName && <span className="text-sm text-muted-foreground">( {dayName} )</span>}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="groupDropdown" className="text-sm font-medium">Choose Group</label>
+                        <Select
+                            value={groupDropdown}
+                            onValueChange={setGroupDropdown}
+                            disabled={groups.length === 0}
+                        >
+                            <SelectTrigger id="groupDropdown">
+                                <SelectValue placeholder={groups.length === 0 ? "No groups available" : "Select a group"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {groups.map((group) => (
+                                    <SelectItem key={group} value={group}>
+                                        {group}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Display activities */}
-            <div className="activities-container">
+            <div className="activities-container space-y-6">
                 {activities.length === 0 ? (
                     branchDropdown && actDate && (
-                        <p>No activities found for the selected filters.</p>
+                        <Card className="shadow-md">
+                            <CardContent className="py-12">
+                                <div className="text-center space-y-2">
+                                    <p className="text-lg text-muted-foreground">No activities found for the selected filters.</p>
+                                    <p className="text-sm text-muted-foreground">Try selecting a different date, branch, or group.</p>
+                                </div>
+                            </CardContent>
+                        </Card>
                     )
                 ) : (
                     Object.entries(grouped)
@@ -250,92 +277,111 @@ function KanbanGrpClientForm() {
                                 }
                             }
                             return (
-                                <div className="kanbanCol" key={activityDate}>
-                                    <h2>
-                                        Date : {activityDate}
-                                        {dayLabel && (
-                                            <span style={{ marginLeft: '10px' }}>
-                                                ( {dayLabel} )
-                                            </span>
-                                        )}
-                                    </h2>
-                                    <div className="actBoxContainer">
-                                        {items
-                                            .slice()
-                                            .sort((a, b) => {
-                                                // Handle missing or invalid times
-                                                if (!a.activity_time) return 1;
-                                                if (!b.activity_time) return -1;
-                                                return a.activity_time.localeCompare(b.activity_time);
-                                            })
-                                            // Only show unique activity_name per time slot
-                                            .filter(
-                                                (item, idx, arr) =>
-                                                    arr.findIndex(
-                                                        i =>
-                                                            i.activity_name === item.activity_name &&
-                                                            i.activity_time === item.activity_time
-                                                    ) === idx
-                                            )
-                                            .map((item) => {
-                                                // Convert 24h time to 12h format
-                                                let time12h = "";
-                                                if (item.activity_time) {
-                                                    const [hour, minute] = item.activity_time.split(":");
-                                                    const h = parseInt(hour, 10);
-                                                    const ampm = h >= 12 ? "PM" : "AM";
-                                                    const hour12 = ((h + 11) % 12 + 1);
-                                                    time12h = `${hour12}:${minute} ${ampm}`;
-                                                }
-                                                return (
-                                                    <div className="box actBox" key={item.activity_name + item.activity_time}>
-                                                        <span style={{ fontWeight: "bold" }}>
-                                                            {item.activity_time ? time12h + '-' : ""}
-                                                        </span>
-                                                        {item.activity_name}
-                                                    </div>
-                                                );
-                                            })}
-                                    </div>
-                                </div>
+                                <Card key={activityDate} className="shadow-md">
+                                    <CardHeader>
+                                        <CardTitle className="text-xl">
+                                            Date: {activityDate}
+                                            {dayLabel && (
+                                                <span className="text-muted-foreground ml-2">
+                                                    ({dayLabel})
+                                                </span>
+                                            )}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="flex gap-3 overflow-x-auto pb-2">
+                                            {items
+                                                .slice()
+                                                .sort((a, b) => {
+                                                    // Handle missing or invalid times
+                                                    if (!a.activity_time) return 1;
+                                                    if (!b.activity_time) return -1;
+                                                    return a.activity_time.localeCompare(b.activity_time);
+                                                })
+                                                // Only show unique activity_name per time slot
+                                                .filter(
+                                                    (item, idx, arr) =>
+                                                        arr.findIndex(
+                                                            i =>
+                                                                i.activity_name === item.activity_name &&
+                                                                i.activity_time === item.activity_time
+                                                        ) === idx
+                                                )
+                                                .map((item) => {
+                                                    // Convert 24h time to 12h format
+                                                    let time12h = "";
+                                                    if (item.activity_time) {
+                                                        const [hour, minute] = item.activity_time.split(":");
+                                                        const h = parseInt(hour, 10);
+                                                        const ampm = h >= 12 ? "PM" : "AM";
+                                                        const hour12 = ((h + 11) % 12 + 1);
+                                                        time12h = `${hour12}:${minute} ${ampm}`;
+                                                    }
+                                                    return (
+                                                        <Card 
+                                                            key={item.activity_name + item.activity_time}
+                                                            className="hover:shadow-lg transition-all hover:border-primary border-2 w-72 flex-shrink-0"
+                                                        >
+                                                            <CardContent className="p-4">
+                                                                <div className="text-center">
+                                                                    <div className="font-bold text-primary mb-1">
+                                                                        {item.activity_time ? time12h : ""}
+                                                                    </div>
+                                                                    <div className="font-semibold">
+                                                                        {item.activity_name}
+                                                                    </div>
+                                                                </div>
+                                                            </CardContent>
+                                                        </Card>
+                                                    );
+                                                })}
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             );
                         })
                 )}
             </div>
 
             {/* Display Unique Pax Count */}
-            <div className="PaxCount">
-                <span style={{ color: 'green' }}>
+            <div className="PaxCount flex gap-2 mb-4">
+                <Badge variant="default" className="text-base">
                     {
                         new Set(
                             activities
                             .map(item => item.submission.participant.id)
                         ).size
-                    } pax <br />
-                    With a health condition - 
-                    {
+                    } pax
+                </Badge>
+                <Badge variant="destructive" className="text-base">
+                    With health condition: {
                         new Set(
                             activities
                             .filter(item => item.submission.participant.health_declaration)
                             .map(item => item.submission.participant.id)
                         ).size
                     } pax
-                </span>
+                </Badge>
             </div>
                         
             {/* Display Participant */}
-            <div className="participants-container">
-                {activities.length > 0 ? (
-                    // Get unique participants by ID, then sort with health condition and no insurance at the top
-                    [...new Map(
-                        activities.map(activity => [
-                            activity.submission.participant.id,
-                            {
-                                participant: activity.submission.participant,
-                                insurance: activity.submission.yas_insurance
-                            }
-                        ])
-                    ).values()]
+            <Card className="shadow-md">
+                <CardHeader>
+                    <CardTitle className="text-2xl">Participants</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                        {activities.length > 0 ? (
+                            // Get unique participants by ID, then sort with health condition and no insurance at the top
+                            [...new Map(
+                                activities.map(activity => [
+                                    activity.submission.participant.id,
+                                    {
+                                        participant: activity.submission.participant,
+                                        insurance: activity.submission.yas_insurance
+                                    }
+                                ])
+                            ).values()]
                     .sort((a, b) => {
                         const aHasHealth = a.participant.health_declaration;
                         const bHasHealth = b.participant.health_declaration;
@@ -351,33 +397,41 @@ function KanbanGrpClientForm() {
                         return 0;
                     })
                     .map(({participant, insurance}) => (
-                        <div key={participant.id}>
-                            <Link href={`/kanban/clinfo/${participant.id}`}>
-                                <div className="box">
-                                    {participant.fullname} <br />
-                                    {participant.phone_number} <br />
-                                    {participant.age} years old <br />
+                        <Link 
+                            key={participant.id}
+                            href={`/kanban/clinfo/${participant.id}`}
+                        >
+                            <Card className="hover:shadow-lg transition-all hover:border-primary border-2">
+                                <CardContent className="p-4">
+                                    <div className="font-medium">{participant.fullname}</div>
+                                    <div className="text-sm text-muted-foreground">{participant.phone_number}</div>
+                                    <div className="text-sm">{participant.age} years old</div>
                                     {participant.health_declaration ? (
-                                        <span style={{ color: 'red' }}>
+                                        <Badge variant="destructive" className="mt-2 whitespace-normal text-left break-words">
                                             {participant.health_declaration}
-                                        </span>
+                                        </Badge>
                                     ) : (
-                                        <span style={{ color: 'blue' }}>No Health Condition</span>
+                                        <Badge variant="secondary" className="mt-2">No Health Condition</Badge>
                                     )}
                                     {insurance && (
-                                        <div>
+                                        <div className="text-sm mt-2">
                                             <em>Insurance:</em> {insurance}
                                         </div>
                                     )}
-                                </div>
-                            </Link>
-                        </div>
+                                </CardContent>
+                            </Card>
+                        </Link>
                     ))
-                ) : (
-                    branchDropdown && actDate && (
-                        <p>No participants found for the selected filters.</p>
-                    )
-                )}
+                        ) : (
+                            branchDropdown && actDate && (
+                                <div className="col-span-full text-center py-8">
+                                    <p className="text-muted-foreground">No participants found for the selected filters.</p>
+                                </div>
+                            )
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
             </div>
         </div>
     );   

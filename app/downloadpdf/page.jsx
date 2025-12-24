@@ -2,6 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -117,93 +122,118 @@ const downloadSinglePDF = async (submissionId, participantName) => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Indemnity Forms - PDF Download</h1>
-
-      {/* Download by Group */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Download by Group</h2>
-        <div className="flex gap-4">
-          <select
-            value={selectedGroup}
-            onChange={(e) => setSelectedGroup(e.target.value)}
-            className="flex-1 px-4 py-2 border rounded-lg"
-            disabled={loading}
-          >
-            <option value="">Select a group...</option>
-            {[...groups].sort().map(group => (
-            <option key={group} value={group}>{group}</option>
-            ))}
-          </select>
-          <button
-            onClick={() => downloadGroupPDFs(selectedGroup)}
-            disabled={!selectedGroup || loading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Generating...' : 'Download All in Group'}
-          </button>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      <div className="max-w-6xl mx-auto p-6 space-y-6">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold tracking-tight">Indemnity Forms</h1>
+          <p className="text-muted-foreground text-lg">Download and print participant indemnity forms</p>
         </div>
-      </div>
 
-      {/* Individual Submissions List */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Individual Submissions</h2>
-        
-        {submissions.length === 0 ? (
-          <p className="text-gray-500">No submissions found.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Name</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">NRIC</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Group</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Branch</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Activity</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {submissions.map((submission) => (
-                  <tr key={submission.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-black">{submission.participants?.fullname}</td>
-                    <td className="px-4 py-3 text-sm text-black">{submission.participants?.nric}</td>
-                    <td className="px-4 py-3 text-sm">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                        {submission.group || 'N/A'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-black">{submission.branch}</td>
-                    <td className="px-4 py-3 text-sm text-black">
-                      {submission.activities?.[0]?.activity_name || 'N/A'}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      <button
-                        onClick={() => downloadSinglePDF(submission.id, submission.participants?.fullname)}
-                        disabled={loading}
-                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
-                      >
-                        Download PDF
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+        {/* Download by Group */}
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl">Download by Group</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4">
+              <Select
+                value={selectedGroup}
+                onValueChange={setSelectedGroup}
+                disabled={loading}
+              >
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Select a group..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {[...groups].sort().map(group => (
+                    <SelectItem key={group} value={group}>{group}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                onClick={() => downloadGroupPDFs(selectedGroup)}
+                disabled={!selectedGroup || loading}
+              >
+                {loading ? 'Generating...' : 'Download All in Group'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Individual Submissions List */}
+        <Card className="shadow-md">
+        <CardHeader>
+          <CardTitle className="text-2xl">Individual Submissions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {submissions.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground text-lg">No submissions found.</p>
+              <p className="text-sm text-muted-foreground mt-2">Submissions will appear here once participants complete their forms.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>NRIC</TableHead>
+                    <TableHead>Group</TableHead>
+                    <TableHead>Branch</TableHead>
+                    <TableHead>Activity</TableHead>
+                    <TableHead>Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {submissions.map((submission) => (
+                    <TableRow key={submission.id}>
+                      <TableCell>{submission.participants?.fullname}</TableCell>
+                      <TableCell>{submission.participants?.nric}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">
+                          {submission.group || 'N/A'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{submission.branch}</TableCell>
+                      <TableCell>
+                        {submission.activities?.[0]?.activity_name || 'N/A'}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          onClick={() => downloadSinglePDF(submission.id, submission.participants?.fullname)}
+                          disabled={loading}
+                          variant="default"
+                          size="sm"
+                        >
+                          Download PDF
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {loading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-lg">Generating PDF...</p>
-            <p className="text-sm text-gray-500 mt-2">This may take a few moments...</p>
-          </div>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <Card className="max-w-sm">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto"></div>
+                <div>
+                  <p className="text-lg font-semibold">Generating PDF...</p>
+                  <p className="text-sm text-muted-foreground mt-2">This may take a few moments</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
+      </div>
     </div>
   )
 }
