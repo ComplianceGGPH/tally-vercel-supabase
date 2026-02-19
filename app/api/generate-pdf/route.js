@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import puppeteer from 'puppeteer-core'
 import chromium from '@sparticuz/chromium'
 import { createClient } from '@supabase/supabase-js'
+import fs from 'fs'
+import path from 'path'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -122,7 +124,18 @@ async function generatePDF(data) {
   })
   
   const page = await browser.newPage()
-  const htmlContent = generateHTMLTemplate(data)
+  
+  // Convert logo to base64
+  let logoBase64 = ''
+  try {
+    const logoPath = path.join(process.cwd(), 'public', 'logo', 'ggph.png')
+    const logoBuffer = fs.readFileSync(logoPath)
+    logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`
+  } catch (error) {
+    console.error('Error loading logo:', error)
+  }
+  
+  const htmlContent = generateHTMLTemplate(data, logoBase64)
   
   await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
   
@@ -136,53 +149,61 @@ async function generatePDF(data) {
   return pdfBuffer
 }
 
-function generateHTMLTemplate(data) {
+function generateHTMLTemplate(data, logoBase64 = '') {
   const { submission, participant, activities, emergency, guardian } = data
   
-  // Parse health declaration - could be string, object, or array
-  let healthDeclaration = participant.health_declaration || []
+  // Parse health declaration
+  let healthDeclaration = participant.health_declaration || ''
+  let healthArray = []
   
-  // If it's a string, try to parse it as JSON
+  // If it's a string, check if it's JSON or plain text
   if (typeof healthDeclaration === 'string') {
-    try {
-      healthDeclaration = JSON.parse(healthDeclaration)
-    } catch (e) {
-      healthDeclaration = []
+    if (healthDeclaration.trim().startsWith('[') || healthDeclaration.trim().startsWith('{')) {
+      // Try to parse as JSON
+      try {
+        const parsed = JSON.parse(healthDeclaration)
+        healthArray = Array.isArray(parsed) ? parsed : Object.values(parsed).filter(Boolean)
+      } catch (e) {
+        // If parsing fails, treat as plain text (other condition)
+        healthArray = healthDeclaration.trim() ? [healthDeclaration] : []
+      }
+    } else {
+      // Plain text - treat as "other" condition
+      healthArray = healthDeclaration.trim() ? [healthDeclaration] : []
     }
+  } else if (Array.isArray(healthDeclaration)) {
+    healthArray = healthDeclaration
+  } else if (typeof healthDeclaration === 'object' && healthDeclaration !== null) {
+    healthArray = Object.values(healthDeclaration).filter(Boolean)
   }
   
-  // If it's an object, convert to array of values
-  if (typeof healthDeclaration === 'object' && !Array.isArray(healthDeclaration)) {
-    healthDeclaration = Object.values(healthDeclaration).filter(Boolean)
-  }
+  // Check if each condition is selected (from predefined checkboxes)
+  const hasAsthma = healthArray.some(item => item && (item.includes('Asthma') || item.includes('Asma')))
+  const hasBrainInjury = healthArray.some(item => item && (item.includes('Brain') || item.includes('Otak')))
+  const hasChestSurgery = healthArray.some(item => item && (item.includes('Chest Surgery') || item.includes('Pembedahan Dada')))
+  const hasBronchitis = healthArray.some(item => item && (item.includes('Chronic Bronchitis') || item.includes('Bronkitis')))
+  const hasEpilepsy = healthArray.some(item => item && (item.includes('Epilepsy') || item.includes('Epilepsi')))
+  const hasHeartDisease = healthArray.some(item => item && (item.includes('Heart') || item.includes('Jantung')))
+  const hasInjury = healthArray.some(item => item && (item.includes('Injury') || item.includes('Surgery') || item.includes('Kecederaan')))
+  const isPregnant = healthArray.some(item => item && (item.includes('Pregnant') || item.includes('Mengandung')))
   
-  // Ensure it's an array
-  if (!Array.isArray(healthDeclaration)) {
-    healthDeclaration = []
-  }
-  
-  // Check if each condition is selected
-  const hasAsthma = healthDeclaration.some(item => item && (item.includes('Asthma') || item.includes('Asma')))
-  const hasBrainInjury = healthDeclaration.some(item => item && (item.includes('Brain') || item.includes('Otak')))
-  const hasChestSurgery = healthDeclaration.some(item => item && (item.includes('Chest Surgery') || item.includes('Pembedahan Dada')))
-  const hasBronchitis = healthDeclaration.some(item => item && (item.includes('Chronic Bronchitis') || item.includes('Bronkitis')))
-  const hasEpilepsy = healthDeclaration.some(item => item && (item.includes('Epilepsy') || item.includes('Epilepsi')))
-  const hasHeartDisease = healthDeclaration.some(item => item && (item.includes('Heart disease') || item.includes('Jantung')))
-  const hasInjury = healthDeclaration.some(item => item && (item.includes('Injury or Surgery') || item.includes('Kecederaan')))
-  const isPregnant = healthDeclaration.some(item => item && (item.includes('Pregnant') || item.includes('Mengandung')))
-  
-  // Check for "other" conditions (anything not in the standard list)
+  // Check for "other" conditions
   const standardConditions = ['Asthma', 'Asma', 'Brain', 'Otak', 'Chest Surgery', 'Pembedahan Dada', 
                                'Bronchitis', 'Bronkitis', 'Epilepsy', 'Epilepsi', 'Heart', 'Jantung',
-                               'Injury', 'Kecederaan', 'Pregnant', 'Mengandung']
-  const otherConditions = healthDeclaration.filter(item => 
-    item && !standardConditions.some(std => item.includes(std))
-  )
+                               'Pregnant', 'Mengandung']
+  
+  // If it's free-form text (not matching any standard conditions), treat as "other"
+  const otherConditions = healthArray.filter(item => {
+    if (!item) return false
+    // If it doesn't contain any standard condition keywords, it's "other"
+    return !standardConditions.some(std => item.includes(std))
+  })
+  
   const hasOther = otherConditions.length > 0
   const otherDescription = otherConditions.join(', ')
   
-  // If no health issues selected, mark all as NO
-  const hasNoIssues = healthDeclaration.length === 0
+  // If no health issues at all
+  const hasNoIssues = healthArray.length === 0
   
   return `
     <!DOCTYPE html>
@@ -357,7 +378,7 @@ function generateHTMLTemplate(data) {
     </head>
     <body>
       <div class="header">
-        <img src="https://s6.imgcdn.dev/Y5v8Co.png" alt="GGPH Logo" width="200" />
+        ${logoBase64 ? `<img src="${logoBase64}" alt="GGPH Logo" width="200" />` : '<div style="height: 80px;"></div>'}
         <h1>PARTICIPANT'S REGISTRATION AND ACKNOWLEDGEMENT OF RISK</h1>
         <p>**Please take note that this is a customer copy only.**</p>
       </div>

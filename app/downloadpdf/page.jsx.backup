@@ -17,7 +17,6 @@ const supabase = createClient(
 
 export default function IndemnityDownload() {
   const [loading, setLoading] = useState(false)
-  const [loadingData, setLoadingData] = useState(false)
   const [submissions, setSubmissions] = useState([])
   const [filteredSubmissions, setFilteredSubmissions] = useState([])
   const [branchDropdown, setBranchDropdown] = useState('GOPENG GLAMPING PARK')
@@ -28,24 +27,25 @@ export default function IndemnityDownload() {
   const [searchQuery, setSearchQuery] = useState('')
   const [groups, setGroups] = useState([])
   const [activities, setActivities] = useState([])
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
 
   // Load saved values from localStorage
   useEffect(() => {
     const savedDate = localStorage.getItem('actDate')
-    const savedBranch = localStorage.getItem('branchDropdown')
+    const savedBranch = localStorage.getItem('
+  useEffect(() => {
+    applyFilters()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedGroup, selectedActivity, searchQuery, submissions])
 
-    if (savedDate) {
-      setActDate(savedDate)
-      const day = new Date(savedDate).toLocaleDateString('en-US', { weekday: 'long' })
-      setDayName(day)
+  const loadSubmissions = async () => {
+    if (!branchDropdown || !actDate) {
+      setSubmissions([])
+      setFilteredSubmissions([])
+      return
     }
 
-    if (savedBranch) {
-      setBranchDropdown(savedBranch)
+    setanchDropdown(savedBranch)
     }
-    
-    setIsInitialLoad(false)
   }, [])
 
   const handleDateChange = (e) => {
@@ -64,51 +64,27 @@ export default function IndemnityDownload() {
 
   // Fetch submissions when branch and date are selected
   useEffect(() => {
-    if (!isInitialLoad) {
-      loadSubmissions()
-    }
-  }, [branchDropdown, actDate, isInitialLoad])
+    loadSubmissions()
+  }, [branchDropdown, actDate])
 
-  // Load filter options (groups and activities) when submissions or selectedActivity change
+  // Load filter options (groups and activities) when submissions change
   useEffect(() => {
     if (submissions.length > 0) {
       loadFilters()
     }
-  }, [submissions, selectedActivity])
+  }, [submissions])
 
-  // Apply filters whenever any filter changes
+  // Apply filters whenever any filter changes (but not on initial load)
   useEffect(() => {
-    applyFilters()
+    if (submissions.length > 0) {
+      applyFilters()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedGroup, selectedActivity, searchQuery, submissions])
+  }, [selectedGroup, selectedActivity, searchQuery])
 
   const loadSubmissions = async () => {
-    if (!branchDropdown || !actDate) {
-      setSubmissions([])
-      setFilteredSubmissions([])
-      return
-    }
-
-    setLoadingData(true)
+    setDataLoading(true)
     try {
-      // First, get all activities for the selected date
-      const { data: activitiesData, error: actError } = await supabase
-        .from('activities')
-        .select('submission_id, activity_name, activity_date')
-        .eq('activity_date', actDate)
-      
-      if (actError) throw actError
-      
-      // Get unique submission IDs that have activities on this date
-      const submissionIds = [...new Set(activitiesData.map(a => a.submission_id))]
-      
-      if (submissionIds.length === 0) {
-        setSubmissions([])
-        setFilteredSubmissions([])
-        return
-      }
-      
-      // Now fetch only those submissions with participants
       const { data, error } = await supabase
         .from('submissions')
         .select(`
@@ -127,47 +103,49 @@ export default function IndemnityDownload() {
           )
         `)
         .eq('branch', branchDropdown)
-        .in('id', submissionIds)
         .order('created_at', { ascending: false })
       
       if (error) throw error
+
+      // Fetch activities for each submission
+      const submissionsWithActivities = await Promise.all(
+        data.map(async (submission) => {
+          const { data: activities } = await supabase
+            .from('activities')
+            .select('activity_name, activity_date')
+            .eq('submission_id', submission.id)
+            .eq('activity_date', actDate)
+          
+          return {
+            ...submission,
+            activities: activities || []
+          }
+        })
+      )
       
-      // Attach activities to each submission
-      const submissionsWithActivities = data.map(submission => ({
-        ...submission,
-        activities: activitiesData.filter(a => a.submission_id === submission.id)
-      }))
+      // Filter out submissions with no activities on this date
+      const filtered = submissionsWithActivities.filter(s => s.activities.length > 0)
       
-      setSubmissions(submissionsWithActivities)
-      setFilteredSubmissions(submissionsWithActivities)
-    } catch (error) {
-      console.error('Error loading submissions:', error)
-      alert('Failed to load submissions')
-    } finally {
-      setLoadingData(false)
+      setSubmissions(filtered)
+      setFilteredSubmissions(filtered)
+    } catLoading(false)
     }
   }
 
   const loadFilters = () => {
-    // Filter submissions based on selected activity first
-    let filteredForGroups = submissions
-
-    // If an activity is selected, only show groups that have that activity
-    if (selectedActivity) {
-      filteredForGroups = submissions.filter(s => 
-        s.activities?.some(a => a.activity_name === selectedActivity)
-      )
-    }
-
-    // Get unique groups from the filtered submissions
-    const uniqueGroups = [...new Set(filteredForGroups.map(s => s.group).filter(Boolean))].sort()
+    // Get unique groups from submissions
+    const uniqueGroups = [...new Set(submissions.map(s => s.group).filter(Boolean))].sort()
     setGroups(uniqueGroups)
 
-    // Get unique activities from all submissions (not filtered)
+    // Get unique activities from submissions
     const uniqueActivities = [...new Set(
       submissions.flatMap(s => s.activities?.map(a => a.activity_name) || [])
     )].sort()
     setActivities(uniqueActivities)
+    if (activityData) {
+      const uniqueActivities = [...new Set(activityData.map(d => d.activity_name).filter(Boolean))].sort()
+      setActivities(uniqueActivities)
+    }
   }
 
   const applyFilters = () => {
@@ -425,7 +403,7 @@ export default function IndemnityDownload() {
               <div className="text-center py-12">
                 <p className="text-muted-foreground text-lg">Please select a branch and date to view submissions.</p>
               </div>
-            ) : loadingData ? (
+            ) : loading ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-primary mx-auto mb-4"></div>
                 <p className="text-muted-foreground">Loading submissions...</p>

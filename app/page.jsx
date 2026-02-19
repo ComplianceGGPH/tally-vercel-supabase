@@ -3,7 +3,7 @@ import Link from "next/link";
 import styles from './styles/Home.module.css';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText } from 'lucide-react';
+import { FileText, UserCheck, ShieldCheck } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -11,7 +11,7 @@ export default function Home() {
       <div className="max-w-4xl w-full space-y-8">
         <div className="text-center space-y-4">
           <Image src="/logo/ggph.png" alt="GGPH Logo" width={500} height={150} className="mx-auto" />
-          <h1 className="text-4xl font-bold tracking-tight">Welcome to GGPH Board</h1>
+          <h1 className="text-4xl font-bold tracking-tight">Welcome to GGPH Buletin</h1>
           <p className="text-muted-foreground text-lg">Manage indemnity forms and participant activities</p>
         </div>
 
@@ -46,6 +46,40 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Button variant="outline" className="w-full">Download Center</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/guide-verification" className="block">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <UserCheck className="h-6 w-6" />
+                  <CardTitle>Guide Verification</CardTitle>
+                </div>
+                <CardDescription>
+                  Verify guide credentials and activity competency levels
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" className="w-full">Verify Guide</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/guide-verification-admin" className="block">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-6 w-6" />
+                  <CardTitle>Guide Admin Panel</CardTitle>
+                </div>
+                <CardDescription>
+                  Admin access to view guide certificates and card links
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" className="w-full">Admin Access</Button>
               </CardContent>
             </Card>
           </Link>
