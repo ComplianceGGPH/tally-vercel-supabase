@@ -26,6 +26,7 @@ function KanbanGrpClientForm() {
         useState(searchParams.get("date") || "");
     const [activities, setActivities] = useState([]);
     const [dayName, setDayName] = useState('');
+    const [selectedActivity, setSelectedActivity] = useState(null); // For filtering participants
 
     // Fetch groups when branch or date changes
     useEffect(() => {
@@ -317,10 +318,29 @@ function KanbanGrpClientForm() {
                                                         const hour12 = ((h + 11) % 12 + 1);
                                                         time12h = `${hour12}:${minute} ${ampm}`;
                                                     }
+                                                    
+                                                    const isSelected = selectedActivity && 
+                                                        selectedActivity.name === item.activity_name && 
+                                                        selectedActivity.date === activityDate && 
+                                                        selectedActivity.time === item.activity_time;
+                                                    
                                                     return (
                                                         <Card 
                                                             key={item.activity_name + item.activity_time}
-                                                            className="hover:shadow-lg transition-all hover:border-primary border-2 w-72 flex-shrink-0"
+                                                            className={`hover:shadow-lg transition-all border-2 w-72 flex-shrink-0 cursor-pointer ${
+                                                                isSelected ? 'border-primary bg-primary/5' : 'hover:border-primary'
+                                                            }`}
+                                                            onClick={() => {
+                                                                if (isSelected) {
+                                                                    setSelectedActivity(null); // Deselect if clicking the same one
+                                                                } else {
+                                                                    setSelectedActivity({
+                                                                        name: item.activity_name,
+                                                                        date: activityDate,
+                                                                        time: item.activity_time
+                                                                    });
+                                                                }
+                                                            }}
                                                         >
                                                             <CardContent className="p-4">
                                                                 <div className="text-center">
@@ -330,6 +350,11 @@ function KanbanGrpClientForm() {
                                                                     <div className="font-semibold">
                                                                         {item.activity_name}
                                                                     </div>
+                                                                    {isSelected && (
+                                                                        <Badge variant="default" className="mt-2">
+                                                                            Selected
+                                                                        </Badge>
+                                                                    )}
                                                                 </div>
                                                             </CardContent>
                                                         </Card>
@@ -344,19 +369,52 @@ function KanbanGrpClientForm() {
             </div>
 
             {/* Display Unique Pax Count */}
-            <div className="PaxCount flex gap-2 mb-4">
+            <div className="PaxCount flex flex-wrap gap-2 mb-4 items-center">
+                {selectedActivity && (
+                    <div className="flex items-center gap-2 mr-2">
+                        <Badge variant="outline" className="text-base">
+                            Filtered: {selectedActivity.name} ({selectedActivity.time ? (() => {
+                                const [hour, minute] = selectedActivity.time.split(":");
+                                const h = parseInt(hour, 10);
+                                const ampm = h >= 12 ? "PM" : "AM";
+                                const hour12 = ((h + 11) % 12 + 1);
+                                return `${hour12}:${minute} ${ampm}`;
+                            })() : ""})
+                        </Badge>
+                        <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => setSelectedActivity(null)}
+                        >
+                            Clear Filter
+                        </Button>
+                    </div>
+                )}
                 <Badge variant="default" className="text-base">
                     {
                         new Set(
-                            activities
-                            .map(item => item.submission.participant.id)
+                            (selectedActivity 
+                                ? activities.filter(item => 
+                                    item.activity_name === selectedActivity.name &&
+                                    item.activity_date === selectedActivity.date &&
+                                    item.activity_time === selectedActivity.time
+                                  )
+                                : activities
+                            ).map(item => item.submission.participant.id)
                         ).size
                     } pax
                 </Badge>
                 <Badge variant="destructive" className="text-base">
                     With health condition: {
                         new Set(
-                            activities
+                            (selectedActivity 
+                                ? activities.filter(item => 
+                                    item.activity_name === selectedActivity.name &&
+                                    item.activity_date === selectedActivity.date &&
+                                    item.activity_time === selectedActivity.time
+                                  )
+                                : activities
+                            )
                             .filter(item => item.submission.participant.health_declaration)
                             .map(item => item.submission.participant.id)
                         ).size
@@ -367,14 +425,28 @@ function KanbanGrpClientForm() {
             {/* Display Participant */}
             <Card className="shadow-md">
                 <CardHeader>
-                    <CardTitle className="text-2xl">Participants</CardTitle>
+                    <CardTitle className="text-2xl">
+                        Participants
+                        {selectedActivity && (
+                            <span className="text-base font-normal text-muted-foreground ml-2">
+                                (Showing only participants in selected activity)
+                            </span>
+                        )}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                         {activities.length > 0 ? (
                             // Get unique participants by ID, then sort with health condition and no insurance at the top
                             [...new Map(
-                                activities.map(activity => [
+                                (selectedActivity 
+                                    ? activities.filter(item => 
+                                        item.activity_name === selectedActivity.name &&
+                                        item.activity_date === selectedActivity.date &&
+                                        item.activity_time === selectedActivity.time
+                                      )
+                                    : activities
+                                ).map(activity => [
                                     activity.submission.participant.id,
                                     {
                                         participant: activity.submission.participant,
