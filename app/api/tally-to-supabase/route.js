@@ -225,7 +225,48 @@ export async function POST(request) {
       isMinor ? answers["guardianphone"] : answers["phonenumber"]
     );
 
+    // for packagedTB, we want to give insurance to anyone who bought the package within their stay, including if dont have activity.
+    function getDateRange(checkInDate, checkOutDate) {
+      const dates = [];
+      
+      // Parse the dates
+      const startDate = new Date(checkInDate);
+      const endDate = new Date(checkOutDate);
+      
+      // Clone the start date to avoid modifying it
+      const currentDate = new Date(startDate);
+      
+      // Loop through dates from start to end (inclusive)
+      while (currentDate <= endDate) {
+        // Add the current date to the array
+        dates.push(new Date(currentDate));
+        
+        // Move to the next day
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      
+      return dates;
+    }
+
+    const allActivity = [
+      answers["activity1"], 
+      answers["activity2"], 
+      answers["activity3"], 
+      answers["activity4"],
+      answers["activity5"], 
+      answers["activity6"], 
+      answers["activity7"]
+    ]
+
+    let tBuildingPackageDates = [];
+
+    if (answers["bookingstatus"] === "Stay In Guest / Tetamu Menginap" && allActivity.includes("Team Building")) {
+      tBuildingPackageDates = getDateRange(answers["checkindate"], answers["checkoutdate"]);
+      console.log(tBuildingPackageDates); 
+    }
+
     const effectiveStartDates = [
+      ...tBuildingPackageDates,
       answers["activitydate1"], 
       answers["activitydate2"], 
       answers["activitydate3"], 
@@ -235,6 +276,7 @@ export async function POST(request) {
       answers["activitydate7"]
     ]
     .filter(Boolean) // remove null/undefined/empty
+    .map(date => date instanceof Date ? date.toISOString().split('T')[0] : date)
     .filter((date, idx, arr) => arr.indexOf(date) === idx) // remove duplicates
     .sort((a, b) => new Date(a) - new Date(b)); // sort earliest → latest
 
@@ -273,15 +315,15 @@ export async function POST(request) {
     // Decide which promo to use based on branch
     if (InsuranceData.branch === "GOPENG GLAMPING PARK") {
       insuranceRes = await createPolicy(InsuranceData);
+      console.log("Insurance response:", insuranceRes);
     } else {
       // makes it so that only stay in guest can receive insurance
       if (answers["bookingstatus"] == "Stay In Guest / Tetamu Menginap") {
         InsuranceData.branch = "PUTRAJAYA LAKE RECREATION CENTER";
         insuranceRes = await createPolicy(InsuranceData);
+        console.log("Insurance response:", insuranceRes);
       }
     }
-
-    console.log("Insurance response:", insuranceRes);
 
     // ✅ Extract product name if available
     const insuranceData = Array.isArray(insuranceRes) ? insuranceRes[0] : null;
