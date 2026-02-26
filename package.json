@@ -11,7 +11,7 @@
   "dependencies": {
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.4",
-    "@sparticuz/chromium": "^141.0.0",
+    "@sparticuz/chromium": "^126.0.0",
     "@supabase/supabase-js": "^2.57.4",
     "axios": "^1.12.2",
     "class-variance-authority": "^0.7.1",
@@ -22,7 +22,7 @@
     "lucide-react": "^0.562.0",
     "next": "15.5.9",
     "pdf-lib": "^1.17.1",
-    "puppeteer-core": "^24.29.1",
+    "puppeteer-core": "^22.12.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "tailwind-merge": "^3.4.0"
