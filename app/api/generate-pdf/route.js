@@ -135,7 +135,26 @@ async function generatePDF(data) {
     console.error('Error loading logo:', error)
   }
   
-  const htmlContent = generateHTMLTemplate(data, logoBase64)
+  // Convert QR codes to base64
+  let qrAcknowledgementBase64 = ''
+  let qrTermsBase64 = ''
+  try {
+    const qrAckPath = path.join(process.cwd(), 'public', 'qr', 'acknowledgement-of-risk.png')
+    const qrAckBuffer = fs.readFileSync(qrAckPath)
+    qrAcknowledgementBase64 = `data:image/png;base64,${qrAckBuffer.toString('base64')}`
+  } catch (error) {
+    console.error('Error loading QR acknowledgement:', error)
+  }
+  
+  try {
+    const qrTermsPath = path.join(process.cwd(), 'public', 'qr', 'terms-and-condition.png')
+    const qrTermsBuffer = fs.readFileSync(qrTermsPath)
+    qrTermsBase64 = `data:image/png;base64,${qrTermsBuffer.toString('base64')}`
+  } catch (error) {
+    console.error('Error loading QR terms:', error)
+  }
+  
+  const htmlContent = generateHTMLTemplate(data, logoBase64, qrAcknowledgementBase64, qrTermsBase64)
   
   await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
   
@@ -149,7 +168,7 @@ async function generatePDF(data) {
   return pdfBuffer
 }
 
-function generateHTMLTemplate(data, logoBase64 = '') {
+function generateHTMLTemplate(data, logoBase64 = '', qrAcknowledgementBase64 = '', qrTermsBase64 = '') {
   const { submission, participant, activities, emergency, guardian } = data
   
   // Parse health declaration
@@ -186,12 +205,7 @@ function generateHTMLTemplate(data, logoBase64 = '') {
   const hasHeartDisease = healthArray.some(item => item && (item.includes('Heart') || item.includes('Jantung')))
   const hasInjury = healthArray.some(item => item && (item.includes('Injury') || item.includes('Surgery') || item.includes('Kecederaan')))
   const isPregnant = healthArray.some(item => item && (item.includes('Pregnant') || item.includes('Mengandung')))
-  
-  // Check for "other" conditions
-  const standardConditions = ['Asthma', 'Asma', 'Brain', 'Otak', 'Chest Surgery', 'Pembedahan Dada', 
-                               'Bronchitis', 'Bronkitis', 'Epilepsy', 'Epilepsi', 'Heart', 'Jantung',
-                               'Pregnant', 'Mengandung']
-  
+
   // If it's free-form text (not matching any standard conditions), treat as "other"
   const otherConditions = healthArray.filter(item => {
     if (!item) return false
@@ -337,6 +351,7 @@ function generateHTMLTemplate(data, logoBase64 = '') {
           padding-top: 40px;
           border-bottom: 2px solid #000;
           position: relative;
+          text-align: center;
         }
         
         .signature-box label {
@@ -345,6 +360,11 @@ function generateHTMLTemplate(data, logoBase64 = '') {
           left: 0;
           font-weight: bold;
           font-size: 10px;
+        }
+        
+        .signature-box img {
+          display: block;
+          margin: 0 auto;
         }
         
         .guardian-section {
@@ -373,6 +393,34 @@ function generateHTMLTemplate(data, logoBase64 = '') {
           border-left: 4px solid #2196F3;
           font-size: 10px;
           font-style: italic;
+        }
+        
+        .qr-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 30px;
+          margin: 20px 0;
+          padding: 20px;
+        }
+        
+        .qr-box {
+          text-align: center;
+          flex: 1;
+          max-width: 400px;
+        }
+        
+        .qr-box img {
+          width: 100%;
+          max-width: 350px;
+          height: auto;
+        }
+        
+        .qr-label {
+          font-weight: bold;
+          font-size: 11px;
+          margin-bottom: 10px;
+          color: #333;
         }
       </style>
     </head>
@@ -551,28 +599,27 @@ function generateHTMLTemplate(data, logoBase64 = '') {
       </div>
       ` : ''}
 
-      <!-- DECLARATION -->
+      <!-- DECLARATION - QR CODES -->
       <div class="section">
-        <div class="declaration">
-          <p>In consideration for being allowed to participate in this Activity, on behalf of myself and my next of kin, heirs and representatives, I release from all liability and promise not to sue Glamping Park Travel & Tour Sdn Bhd and their employees, officers, directors, volunteers and agents from any and all claims, including claims of the company's negligence, resulting in any physical or psychological injury (including paralysis and death), illness, damages, or economic or emotional loss I may suffer because of my participation in this Activity, including travel to, from, during and after the Activity.</p>
-          
-          <p>I am voluntarily participating in this Activity. I understand that these injuries or outcomes may arise from my own or other's actions, inaction, or negligence; conditions related to travel; or the condition of the Activity location(s). Nonetheless, I assume all related risks, both known or unknown to me, of my participation in this Activity, including travel to, from and during the Activity.</p>
-          
-          <p>I agree to hold the Company harmless from any and all claims, including attorney's fees or damage to my personal property that may occur as a result of my participation in this Activity, including travel to, from and during the Activity. If the Company incurs any of these types of expenses, I agree to reimburse the Company. If I need medical treatment, I agree to be financially responsible for any costs incurred as a result of such treatment. I am aware and understand that I should carry my own health insurance.</p>
-          
-          <p>I completely understand that all photos and video taken before, during and after Activity is for the use of GGP Holdings Sdn. Bhd. only and I have no rights to ask for soft copy or hardcopy of the photos and videos unless pre-book for the content. The client(s) hereby allow(s) the footage to be used to promote the business in advertising, brochures, magazine articles, websites, albums etc.</p>
-          
-          <p>I understand the legal consequences of signing this document, including (a) releasing the Company from all liability, (b) promising not to sue the Company, (c) and assuming all risks of participating in this Activity, including travel to, from and during the Activity. I understand that this document is written to be as broad and inclusive as legally permitted by the Malaysian Government and law enforcement. I agree that if any portion is held invalid or unenforceable, I will continue to be bound by the remaining terms.</p>
-          
-          <p>I have read this document, and I am signing it freely. No other representations concerning the legal effect of this document have been made to me.</p>
+        <div class="section-title">ACKNOWLEDGEMENT AND TERMS</div>
+        <div class="qr-container">
+          <div class="qr-box">
+            ${qrAcknowledgementBase64 ? `<img src="${qrAcknowledgementBase64}" alt="Acknowledgement of Risk QR" />` : '<p style="font-size: 10px; color: #999;">QR Code not available</p>'}
+          </div>
+          <div class="qr-box">
+            ${qrTermsBase64 ? `<img src="${qrTermsBase64}" alt="Terms and Condition QR" />` : '<p style="font-size: 10px; color: #999;">QR Code not available</p>'}
+          </div>
         </div>
+        <p style="text-align: center; font-size: 10px; color: #666; margin-top: 10px; font-style: italic;">
+          Scan the QR codes above to view the full Acknowledgement of Risk and Terms & Conditions
+        </p>
       </div>
 
       <!-- SIGNATURE SECTION -->
       <div class="signature-section">
         <div class="signature-box">
           <label>Participant Signature:</label>
-          ${participant.participant_signature ? `<img src="${participant.participant_signature}" style="max-height: 50px;" />` : ''}
+          ${participant.participant_signature ? `<img src="${participant.participant_signature}" style="max-height: 60px;" />` : ''}
         </div>
       </div>
 

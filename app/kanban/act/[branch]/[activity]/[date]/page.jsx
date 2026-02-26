@@ -145,7 +145,7 @@ export default function clientBoard({ params }) {
                       return (
                         <Link
                           href={`/kanban/clinfo/${participant.id}`}
-                          key={participant.id || i}
+                          key={item.submission?.id || `${participant.id}-${i}`}
                         >
                           <Card className="hover:shadow-lg transition-all hover:border-primary border-2">
                             <CardContent className="p-4">
