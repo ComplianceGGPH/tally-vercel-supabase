@@ -12,13 +12,18 @@ const supabase = createClient(
 )
 
 export async function POST(request) {
+  let browser = null
   try {
+    console.log('Starting PDF generation...')
     const { submissionId, group } = await request.json()
     
     if (submissionId) {
+      console.log('Fetching submission data for ID:', submissionId)
       // Fetch single submission with all related data
       const data = await fetchSubmissionData(submissionId)
+      console.log('Data fetched, generating PDF...')
       const pdfBuffer = await generatePDF(data)
+      console.log('PDF generated successfully')
       
       return new NextResponse(pdfBuffer, {
         headers: {
@@ -53,7 +58,11 @@ export async function POST(request) {
     
   } catch (error) {
     console.error('PDF Generation Error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('Error stack:', error.stack)
+    return NextResponse.json({ 
+      error: error.message,
+      details: error.stack 
+    }, { status: 500 })
   }
 }
 
@@ -116,12 +125,28 @@ async function fetchSubmissionData(submissionId) {
 }
 
 async function generatePDF(data) {
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
-  })
+  let browser = null
+  try {
+    console.log('Launching browser...')
+    
+    // Optimize chromium for Vercel
+    chromium.setHeadlessMode = true
+    chromium.setGraphicsMode = false
+    
+    browser = await puppeteer.launch({
+      args: [
+        ...chromium.args,
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+      ],
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
+    })
+    console.log('Browser launched successfully')
   
   const page = await browser.newPage()
   
@@ -156,16 +181,31 @@ async function generatePDF(data) {
   
   const htmlContent = generateHTMLTemplate(data, logoBase64, qrAcknowledgementBase64, qrTermsBase64)
   
-  await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
+  console.log('Setting HTML content...')
+  await page.setContent(htmlContent, { 
+    waitUntil: 'domcontentloaded',
+    timeout: 30000 
+  })
   
+  console.log('Generating PDF...')
   const pdfBuffer = await page.pdf({
     format: 'A4',
     printBackground: true,
-    margin: { top: '15mm', right: '15mm', bottom: '15mm', left: '15mm' }
+    margin: { top: '15mm', right: '15mm', bottom: '15mm', left: '15mm' },
+    timeout: 30000
   })
   
+  console.log('Closing browser...')
   await browser.close()
+  console.log('PDF generation complete')
   return pdfBuffer
+  } catch (error) {
+    console.error('Error in generatePDF:', error)
+    if (browser) {
+      await browser.close()
+    }
+    throw error
+  }
 }
 
 function generateHTMLTemplate(data, logoBase64 = '', qrAcknowledgementBase64 = '', qrTermsBase64 = '') {
