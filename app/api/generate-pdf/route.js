@@ -131,7 +131,13 @@ async function generatePDF(data) {
     console.log('Environment:', process.env.VERCEL ? 'Vercel' : 'Local')
     console.log('Platform:', process.platform)
     
-    // Get executable path - no arguments needed for newer versions
+    // Configure chromium for serverless environment
+    if (process.env.VERCEL) {
+      // Critical: disable graphics mode to avoid missing library issues
+      chromium.setGraphicsMode = false;
+    }
+    
+    // Get executable path
     let executablePath
     if (process.env.VERCEL) {
       // On Vercel, use chromium from @sparticuz/chromium
