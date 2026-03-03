@@ -131,20 +131,10 @@ async function generatePDF(data) {
     console.log('Environment:', process.env.VERCEL ? 'Vercel' : 'Local')
     console.log('Platform:', process.platform)
     
-    // Configure args for serverless
-    const chromeArgs = [
-      '--disable-gpu',
-      '--disable-dev-shm-usage',
-      '--disable-setuid-sandbox',
-      '--no-sandbox',
-      '--single-process',
-      '--no-zygote',
-    ]
-    
     // Get executable path
     let executablePath
     try {
-      executablePath = await chromium.executablePath()
+      executablePath = await chromium.executablePath('/tmp')
       console.log('Chromium executable path:', executablePath)
     } catch (error) {
       console.error('Error getting chromium path:', error)
@@ -152,10 +142,10 @@ async function generatePDF(data) {
     }
     
     browser = await puppeteer.launch({
-      args: [...chromium.args, ...chromeArgs],
+      args: chromium.args,
       defaultViewport: chromium.defaultViewport,
       executablePath: executablePath,
-      headless: 'new',
+      headless: chromium.headless,
       ignoreHTTPSErrors: true,
     })
     console.log('Browser launched successfully')
