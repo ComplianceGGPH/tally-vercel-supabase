@@ -131,17 +131,22 @@ async function generatePDF(data) {
     console.log('Environment:', process.env.VERCEL ? 'Vercel' : 'Local')
     console.log('Platform:', process.platform)
     
-    // Configure chromium for serverless environment
-    if (process.env.VERCEL) {
-      // Critical: disable graphics mode to avoid missing library issues
-      chromium.setGraphicsMode = false;
-    }
-    
     // Get executable path
     let executablePath
-    if (process.env.VERCEL) {
-      // On Vercel, use chromium from @sparticuz/chromium
+    let launchArgs
+    
+    if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      // Serverless environment - use @sparticuz/chromium
       executablePath = await chromium.executablePath()
+      
+      // Use chromium's pre-configured args for serverless
+      launchArgs = [
+        ...chromium.args,
+        '--disable-web-security',
+        '--disable-features=IsolateOrigins,site-per-process',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+      ]
     } else {
       // Local development - use system Chrome
       executablePath = process.platform === 'win32'
@@ -149,14 +154,17 @@ async function generatePDF(data) {
         : process.platform === 'darwin'
         ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
         : '/usr/bin/google-chrome'
+      
+      launchArgs = ['--no-sandbox', '--disable-setuid-sandbox']
     }
+    
     console.log('Chromium executable path:', executablePath)
     
     browser = await puppeteer.launch({
-      args: chromium.args,
+      args: launchArgs,
       defaultViewport: chromium.defaultViewport,
       executablePath: executablePath,
-      headless: chromium.headless,
+      headless: true,
       ignoreHTTPSErrors: true,
     })
     console.log('Browser launched successfully')

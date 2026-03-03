@@ -1,22 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverComponentsExternalPackages: ['@sparticuz/chromium', 'puppeteer-core'],
+    serverComponentsExternalPackages: ['@sparticuz/chromium'],
   },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals = [...(config.externals || []), '@sparticuz/chromium'];
-    }
-    // Ignore node-specific modules that cause issues
-    config.resolve = config.resolve || {};
-    config.resolve.alias = config.resolve.alias || {};
-    config.resolve.alias['sharp$'] = false;
-    config.resolve.alias['canvas'] = false;
+  webpack: (config) => {
+    // Critical for @sparticuz/chromium to work
+    config.externals = [...(config.externals || []), '@sparticuz/chromium'];
+    
+    // Disable file system caching to ensure fresh builds
+    config.cache = false;
     
     return config;
-  },
-  outputFileTracingIncludes: {
-    '/api/generate-pdf': ['./node_modules/@sparticuz/chromium/**/*'],
   },
 };
 
