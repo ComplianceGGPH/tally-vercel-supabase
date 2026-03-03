@@ -1,6 +1,7 @@
 // app/api/generate-pdf/route.js
 import { NextResponse } from 'next/server'
-import playwright from 'playwright-aws-lambda'
+import puppeteer from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 import { createClient } from '@supabase/supabase-js'
 import fs from 'fs'
 import path from 'path'
@@ -130,8 +131,12 @@ async function generatePDF(data) {
     console.log('Environment:', process.env.VERCEL ? 'Vercel' : 'Local')
     console.log('Platform:', process.platform)
     
-    // Launch browser using playwright-aws-lambda
-    browser = await playwright.launchChromium()
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    })
     console.log('Browser launched successfully')
   
     const page = await browser.newPage()
