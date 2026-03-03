@@ -1,7 +1,7 @@
 // app/api/generate-pdf/route.js
 import { NextResponse } from 'next/server'
 import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium-min'
+import chromium from '@sparticuz/chromium'
 import { createClient } from '@supabase/supabase-js'
 import fs from 'fs'
 import path from 'path'
