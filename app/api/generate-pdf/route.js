@@ -1,7 +1,7 @@
 // app/api/generate-pdf/route.js
 import { NextResponse } from 'next/server'
 import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
+import chromium from '@sparticuz/chromium-min'
 import { createClient } from '@supabase/supabase-js'
 import fs from 'fs'
 import path from 'path'
@@ -137,6 +137,18 @@ async function generatePDF(data) {
     
     if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
       // Serverless environment - use @sparticuz/chromium
+      
+      // CRITICAL: Set environment to trigger proper library bundling
+      process.env.AWS_EXECUTION_ENV = 'AWS_Lambda_nodejs20.x'
+      
+      // CRITICAL: Set library path for chromium to use bundled libraries
+      process.env.LD_LIBRARY_PATH = '/tmp/lib:/var/task/node_modules/@sparticuz/chromium/lib'
+      process.env.FONTCONFIG_PATH = '/tmp'
+      
+      // Enable automatic extraction of chromium binary
+      chromium.setHeadlessMode = true
+      chromium.setGraphicsMode = false
+      
       executablePath = await chromium.executablePath()
       
       // Use chromium's pre-configured args for serverless
@@ -144,8 +156,6 @@ async function generatePDF(data) {
         ...chromium.args,
         '--disable-web-security',
         '--disable-features=IsolateOrigins,site-per-process',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
       ]
     } else {
       // Local development - use system Chrome
@@ -159,6 +169,7 @@ async function generatePDF(data) {
     }
     
     console.log('Chromium executable path:', executablePath)
+    console.log('LD_LIBRARY_PATH:', process.env.LD_LIBRARY_PATH)
     
     browser = await puppeteer.launch({
       args: launchArgs,
