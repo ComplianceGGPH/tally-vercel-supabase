@@ -213,7 +213,8 @@ export default function IndemnityDownload() {
   const downloadSinglePDF = async (submissionId, participantName) => {
     setLoading(true)
     try {
-      const response = await fetch('/api/generate-pdf', {
+      // Fetch submission data
+      const response = await fetch('/api/get-submission-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ submissionId })
@@ -222,18 +223,19 @@ export default function IndemnityDownload() {
       if (!response.ok) {
         const errorText = await response.text()
         console.error('API Error:', errorText)
-        throw new Error('Failed to generate PDF')
+        throw new Error('Failed to fetch submission data')
       }
 
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `indemnity_${participantName.replace(/\s+/g, '_')}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      window.URL.revokeObjectURL(url)
+      const data = await response.json()
+
+      // Dynamically import the PDF generator (client-side only)
+      const { generateClientSidePDF } = await import('@/lib/clientPdfGenerator')
+      
+      // Generate PDF on client side
+      const pdf = await generateClientSidePDF(data)
+      
+      // Download the PDF
+      pdf.save(`indemnity_${participantName.replace(/\s+/g, '_')}.pdf`)
     } catch (error) {
       console.error('Error downloading PDF:', error)
       alert(`Failed to download PDF: ${error.message}`)
