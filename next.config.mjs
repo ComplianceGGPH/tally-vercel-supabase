@@ -7,7 +7,16 @@ const nextConfig = {
     if (isServer) {
       config.externals = [...(config.externals || []), '@sparticuz/chromium'];
     }
+    // Ignore node-specific modules that cause issues
+    config.resolve = config.resolve || {};
+    config.resolve.alias = config.resolve.alias || {};
+    config.resolve.alias['sharp$'] = false;
+    config.resolve.alias['canvas'] = false;
+    
     return config;
+  },
+  outputFileTracingIncludes: {
+    '/api/generate-pdf': ['./node_modules/@sparticuz/chromium/**/*'],
   },
 };
 

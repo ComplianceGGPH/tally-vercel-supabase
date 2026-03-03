@@ -131,15 +131,20 @@ async function generatePDF(data) {
     console.log('Environment:', process.env.VERCEL ? 'Vercel' : 'Local')
     console.log('Platform:', process.platform)
     
-    // Get executable path
+    // Get executable path - no arguments needed for newer versions
     let executablePath
-    try {
-      executablePath = await chromium.executablePath('/tmp')
-      console.log('Chromium executable path:', executablePath)
-    } catch (error) {
-      console.error('Error getting chromium path:', error)
-      throw new Error('Failed to find Chromium executable: ' + error.message)
+    if (process.env.VERCEL) {
+      // On Vercel, use chromium from @sparticuz/chromium
+      executablePath = await chromium.executablePath()
+    } else {
+      // Local development - use system Chrome
+      executablePath = process.platform === 'win32'
+        ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+        : process.platform === 'darwin'
+        ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        : '/usr/bin/google-chrome'
     }
+    console.log('Chromium executable path:', executablePath)
     
     browser = await puppeteer.launch({
       args: chromium.args,
