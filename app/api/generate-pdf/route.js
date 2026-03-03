@@ -1,7 +1,6 @@
 // app/api/generate-pdf/route.js
 import { NextResponse } from 'next/server'
-import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
+import playwright from 'playwright-aws-lambda'
 import { createClient } from '@supabase/supabase-js'
 import fs from 'fs'
 import path from 'path'
@@ -131,93 +130,48 @@ async function generatePDF(data) {
     console.log('Environment:', process.env.VERCEL ? 'Vercel' : 'Local')
     console.log('Platform:', process.platform)
     
-    // Get executable path
-    let executablePath
-    let launchArgs
-    
-    if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
-      // Serverless environment - use @sparticuz/chromium
-      
-      // CRITICAL: Set environment to trigger proper library bundling
-      process.env.AWS_EXECUTION_ENV = 'AWS_Lambda_nodejs20.x'
-      
-      // CRITICAL: Set library path for chromium to use bundled libraries
-      process.env.LD_LIBRARY_PATH = '/tmp/lib:/var/task/node_modules/@sparticuz/chromium/lib'
-      process.env.FONTCONFIG_PATH = '/tmp'
-      
-      // Enable automatic extraction of chromium binary
-      chromium.setHeadlessMode = true
-      chromium.setGraphicsMode = false
-      
-      executablePath = await chromium.executablePath()
-      
-      // Use chromium's pre-configured args for serverless
-      launchArgs = [
-        ...chromium.args,
-        '--disable-web-security',
-        '--disable-features=IsolateOrigins,site-per-process',
-      ]
-    } else {
-      // Local development - use system Chrome
-      executablePath = process.platform === 'win32'
-        ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-        : process.platform === 'darwin'
-        ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-        : '/usr/bin/google-chrome'
-      
-      launchArgs = ['--no-sandbox', '--disable-setuid-sandbox']
-    }
-    
-    console.log('Chromium executable path:', executablePath)
-    console.log('LD_LIBRARY_PATH:', process.env.LD_LIBRARY_PATH)
-    
-    browser = await puppeteer.launch({
-      args: launchArgs,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: executablePath,
-      headless: true,
-      ignoreHTTPSErrors: true,
-    })
+    // Launch browser using playwright-aws-lambda
+    browser = await playwright.launchChromium()
     console.log('Browser launched successfully')
   
-  const page = await browser.newPage()
+    const page = await browser.newPage()
   
-  // Convert logo to base64
-  let logoBase64 = ''
-  try {
-    const logoPath = path.join(process.cwd(), 'public', 'logo', 'ggph.png')
-    const logoBuffer = fs.readFileSync(logoPath)
-    logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`
-  } catch (error) {
-    console.error('Error loading logo:', error)
-  }
+    // Convert logo to base64
+    let logoBase64 = ''
+    try {
+      const logoPath = path.join(process.cwd(), 'public', 'logo', 'ggph.png')
+      const logoBuffer = fs.readFileSync(logoPath)
+      logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`
+    } catch (error) {
+      console.error('Error loading logo:', error)
+    }
   
-  // Convert QR codes to base64
-  let qrAcknowledgementBase64 = ''
-  let qrTermsBase64 = ''
-  try {
-    const qrAckPath = path.join(process.cwd(), 'public', 'qr', 'acknowledgement-of-risk.png')
-    const qrAckBuffer = fs.readFileSync(qrAckPath)
-    qrAcknowledgementBase64 = `data:image/png;base64,${qrAckBuffer.toString('base64')}`
-  } catch (error) {
-    console.error('Error loading QR acknowledgement:', error)
-  }
+    // Convert QR codes to base64
+    let qrAcknowledgementBase64 = ''
+    let qrTermsBase64 = ''
+    try {
+      const qrAckPath = path.join(process.cwd(), 'public', 'qr', 'acknowledgement-of-risk.png')
+      const qrAckBuffer = fs.readFileSync(qrAckPath)
+      qrAcknowledgementBase64 = `data:image/png;base64,${qrAckBuffer.toString('base64')}`
+    } catch (error) {
+      console.error('Error loading QR acknowledgement:', error)
+    }
   
-  try {
-    const qrTermsPath = path.join(process.cwd(), 'public', 'qr', 'terms-and-condition.png')
-    const qrTermsBuffer = fs.readFileSync(qrTermsPath)
-    qrTermsBase64 = `data:image/png;base64,${qrTermsBuffer.toString('base64')}`
-  } catch (error) {
-    console.error('Error loading QR terms:', error)
-  }
+    try {
+      const qrTermsPath = path.join(process.cwd(), 'public', 'qr', 'terms-and-condition.png')
+      const qrTermsBuffer = fs.readFileSync(qrTermsPath)
+      qrTermsBase64 = `data:image/png;base64,${qrTermsBuffer.toString('base64')}`
+    } catch (error) {
+      console.error('Error loading QR terms:', error)
+    }
   
-  const htmlContent = generateHTMLTemplate(data, logoBase64, qrAcknowledgementBase64, qrTermsBase64)
+    const htmlContent = generateHTMLTemplate(data, logoBase64, qrAcknowledgementBase64, qrTermsBase64)
   
-  console.log('Setting HTML content...')
-  await page.setContent(htmlContent, { 
-    waitUntil: 'domcontentloaded',
-    timeout: 30000 
-  })
+    console.log('Setting HTML content...')
+    await page.setContent(htmlContent, { 
+      waitUntil: 'domcontentloaded',
+      timeout: 30000 
+    })
   
   console.log('Generating PDF...')
   const pdfBuffer = await page.pdf({
